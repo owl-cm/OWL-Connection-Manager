@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // GitHub Releases Integration
-    const REPO = 'mazghari9/OWL-Connection-Manager';
+    const REPO = 'owl-cm/OWL-Connection-Manager';
     const versionSelect = document.getElementById('version-select');
     const heroDownloadBtn = document.getElementById('hero-download-btn');
     const navDownloadBtn = document.getElementById('nav-download-btn');

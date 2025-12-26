@@ -78,7 +78,7 @@
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/mazghari9/OWL-Connection-Manager.git
+   git clone https://github.com/owl-cm/OWL-Connection-Manager.git
    cd OWL-Connection-Manager
    ```
 
