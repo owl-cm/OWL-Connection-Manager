@@ -1,0 +1,869 @@
+<!--
+  OWL - Connection Manager
+  Copyright (C) 2025 Mohamed AZGHARI
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>OWL</title>
+  <link rel="stylesheet" href="node_modules/xterm/css/xterm.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div id="notification-container" class="notification-container"></div>
+  <div class="container">
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="brand">
+          <div class="brand-logo-container">
+            <svg viewBox="0 0 100 100" class="owl-svg">
+              <defs>
+                <linearGradient id="owl-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:#a855f7;stop-opacity:1" />
+                </linearGradient>
+              </defs>
+              <!-- Cyber-Shield Owl -->
+              <path d="M50 15 L85 35 L85 75 L50 95 L15 75 L15 35 Z" class="owl-shield" />
+              <path d="M30 45 L45 60 M70 45 L55 60" class="owl-eyes-sharp" />
+              <rect x="48" y="70" width="4" height="10" class="owl-cursor-core" />
+            </svg>
+          </div>
+          <h2>OWL</h2>
+        </div>
+        <div class="header-actions">
+          <button id="settings-btn" class="btn-icon" title="Settings">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path
+                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+              </path>
+            </svg>
+          </button>
+          <button id="export-btn" class="btn-icon" title="Export Connections">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+          </button>
+          <button id="import-btn" class="btn-icon" title="Import Connections">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+          </button>
+          <button id="add-folder-btn" class="btn-icon" title="Add Folder">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+              <line x1="12" y1="11" x2="12" y2="17"></line>
+              <line x1="9" y1="14" x2="15" y2="14"></line>
+            </svg>
+          </button>
+          <button id="add-btn" class="btn-icon" title="Add Connection">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="sidebar-search">
+        <div class="search-input-wrapper">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" id="connection-search" placeholder="Search connections...">
+        </div>
+      </div>
+      <ul id="connection-list">
+        <!-- Connections will be injected here -->
+      </ul>
+      <div class="sidebar-footer">
+        <div style="font-size: 10px; opacity: 0.5;">Made with ❤️ by &nbsp;Mohamed AZGHARI</div>
+      </div>
+      <div class="resize-handle"></div>
+    </div>
+    <div class="main-content">
+      <div id="tab-bar" class="tab-bar">
+        <!-- Tabs will be injected here -->
+      </div>
+
+      <div class="workspace-container">
+        <!-- Left Sidebar: File Explorer -->
+        <div id="file-explorer" class="file-explorer-panel collapsed">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span class="icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M3 7C3 5.89543 3.89543 5 5 5H9.58579C9.851 5 10.1054 5.10536 10.2929 5.29289L12.7071 7.70711C12.8946 7.89464 13.149 8 13.4142 8H19C20.1046 8 21 8.89543 21 10V17C21 18.1046 20.1046 19 19 19H5C3.89543 19 3 18.1046 3 17V7Z"
+                    fill="#FACC15" />
+                  <path
+                    d="M3 10C3 8.89543 3.89543 8 5 8H19C20.1046 8 21 8.89543 21 10V17C21 18.1046 20.1046 19 19 19H5C3.89543 19 3 18.1046 3 17V10Z"
+                    fill="#EAB308" />
+                </svg>
+              </span>
+              <span>Explorer</span>
+              <span id="explorer-dir-size" class="dir-size-badge">...</span>
+            </div>
+            <button id="close-explorer" class="panel-close-btn">✕</button>
+          </div>
+          <div class="explorer-nav">
+            <button id="explorer-back" class="btn-icon" title="Go Back">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+              </svg>
+            </button>
+            <input type="text" id="explorer-path" value="/" readonly>
+            <button id="explorer-refresh" class="btn-icon" title="Refresh">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+              </svg>
+            </button>
+            <button id="explorer-upload" class="btn-icon" title="Upload File">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+            </button>
+          </div>
+          <div id="explorer-list" class="explorer-list">
+            <!-- Files will be injected here -->
+          </div>
+        </div>
+
+        <!-- Snippets Palette Modal (Popup) -->
+        <div id="snippets-palette" class="modal hidden" style="align-items: flex-start; padding-top: 100px;">
+          <div class="palette-content glass-panel"
+            style="width: 600px; max-width: 90%; padding: 0; overflow: hidden; display: flex; flex-direction: column;">
+            <div class="palette-search-bar"
+              style="display: flex; align-items: center; padding: 16px; border-bottom: 1px solid var(--glass-border);">
+              <label class="checkbox-container" style="margin-right: 12px; padding-left: 24px; min-height: 18px;">
+                <input type="checkbox" id="palette-select-all">
+                <span class="checkmark"></span>
+              </label>
+              <i class="fas fa-search" style="color: var(--text-secondary); font-size: 18px; margin-right: 12px;"></i>
+              <input type="text" id="palette-search-input" placeholder="Search commands..."
+                style="flex: 1; background: transparent; border: none; color: #fff; font-size: 16px; outline: none;">
+              <button id="palette-delete-btn" class="btn-danger hidden"
+                style="padding: 6px 12px; font-size: 12px; display: flex; align-items: center; gap: 6px; margin-right: 8px;">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+              <button id="palette-add-btn" class="btn-primary"
+                style="padding: 6px 12px; font-size: 12px; display: flex; align-items: center; gap: 6px;">
+                <i class="fas fa-plus"></i> New
+              </button>
+            </div>
+            <div id="palette-list" class="palette-list" style="max-height: 400px; overflow-y: auto; padding: 8px;">
+              <!-- Snippets will be injected here -->
+            </div>
+            <div class="palette-footer"
+              style="padding: 8px 16px; background: rgba(0,0,0,0.2); border-top: 1px solid var(--glass-border); display: flex; justify-content: space-between; font-size: 11px; color: var(--text-secondary);">
+              <span><kbd style="background: rgba(255,255,255,0.1); padding: 2px 4px; border-radius: 4px;">↵</kbd> to
+                run</span>
+              <span><kbd style="background: rgba(255,255,255,0.1); padding: 2px 4px; border-radius: 4px;">Esc</kbd> to
+                close</span>
+            </div>
+          </div>
+        </div>
+
+
+
+
+        <!-- Center: Terminal -->
+        <div class="terminal-area">
+          <div id="terminals-wrapper">
+            <!-- Terminal containers will be injected here -->
+          </div>
+
+          <!-- Bottom Functionalities Bar -->
+          <div class="bottom-bar-container">
+
+
+            <!-- Bottom Dock: Quick Controls & Metrics -->
+            <div class="bottom-dock">
+              <div class="dock-controls">
+                <button id="toggle-explorer-btn" class="dock-btn" title="Toggle Explorer">
+                  <span class="btn-icon folder-icon-container">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#FACC15" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                  </span>
+                  <span class="btn-label">Explorer</span>
+                </button>
+
+                <button id="toggle-snippets-btn" class="dock-btn" title="Toggle Snippets">
+                  <span class="btn-icon">
+                    <i class="fas fa-code" style="color: #a855f7;"></i>
+                  </span>
+                  <span class="btn-label">Snippets</span>
+                </button>
+
+                <button id="broadcast-btn" class="dock-btn" title="Broadcast Mode">
+                  <i class="fas fa-tower-broadcast"></i>
+                  <span class="btn-label">Broadcast</span>
+                </button>
+                <button id="toggle-processes-btn" class="dock-btn" title="Remote Process Manager">
+                  <i class="fas fa-microchip"></i>
+                  <span class="btn-label">Processes</span>
+                </button>
+                <button id="toggle-logs-btn" class="dock-btn" title="View Logs">
+                  <i class="fas fa-history"></i>
+                  <span class="btn-label">Logs</span>
+                </button>
+              </div>
+
+              <div id="metrics-dashboard" class="metrics-mini-dashboard">
+                <div class="system-info-mini">
+                  <span id="os-info" class="info-badge">OS: ...</span>
+                  <span id="uptime-info" class="info-badge">Up: ...</span>
+                </div>
+                <div class="mini-metric" title="CPU Usage">
+                  <div class="metric-label">CPU</div>
+                  <div class="mini-progress">
+                    <div id="cpu-bar" class="bar" style="width: 0%"></div>
+                  </div>
+                  <div id="cpu-val" class="metric-value">0%</div>
+                </div>
+                <div class="mini-metric" title="RAM Usage">
+                  <div class="metric-label">RAM</div>
+                  <div class="mini-progress">
+                    <div id="ram-bar" class="bar" style="width: 0%"></div>
+                  </div>
+                  <div id="ram-val" class="metric-value">0%</div>
+                </div>
+                <div class="mini-metric" title="Disk Usage">
+                  <div class="metric-label">DISK</div>
+                  <div class="mini-progress">
+                    <div id="disk-bar" class="bar" style="width: 0%"></div>
+                  </div>
+                  <div id="disk-val" class="metric-value">0%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="empty-state" class="empty-state">
+        <div class="welcome-container">
+          <div class="welcome-bg-glow"></div>
+
+          <div class="welcome-hero">
+            <div class="welcome-logo-wrapper">
+              <svg viewBox="0 0 100 100" class="owl-svg large">
+                <defs>
+                  <linearGradient id="owl-gradient-large" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#a855f7;stop-opacity:1" />
+                  </linearGradient>
+                </defs>
+                <path d="M50 15 L85 35 L85 75 L50 95 L15 75 L15 35 Z" class="owl-shield"
+                  style="stroke: url(#owl-gradient-large); stroke-width: 2.5; fill: none;" />
+                <path d="M30 45 L45 60 M70 45 L55 60" class="owl-eyes-sharp"
+                  style="stroke: #fff; stroke-width: 4; stroke-linecap: round; filter: drop-shadow(0 0 10px #6366f1);" />
+                <rect x="48" y="70" width="4" height="10" class="owl-cursor-core"
+                  style="fill: #fff; filter: drop-shadow(0 0 10px #6366f1);" />
+              </svg>
+            </div>
+            <h1 class="welcome-title">OWL</h1>
+            <p class="welcome-tagline">Secure. Sleek. Seamless</p>
+          </div>
+
+          <div class="quick-actions-grid">
+            <div id="qa-new" class="quick-action-card">
+              <div class="quick-action-icon">
+                <i class="fas fa-plus"></i>
+              </div>
+              <h4>New Connection</h4>
+              <p>Add a new server to your workspace</p>
+            </div>
+
+            <div id="qa-import" class="quick-action-card">
+              <div class="quick-action-icon">
+                <i class="fas fa-file-import"></i>
+              </div>
+              <h4>Import Data</h4>
+              <p>Restore from a previous backup</p>
+            </div>
+
+            <div id="qa-docs" class="quick-action-card disabled">
+              <div class="quick-action-icon">
+                <i class="fas fa-book"></i>
+              </div>
+              <h4>Documentation</h4>
+              <p>Coming soon...</p>
+            </div>
+          </div>
+
+          <div class="welcome-footer">
+            <span>v1.0.0 Stable</span>
+            <span>Secure AES-256 Encryption</span>
+            <span>Open Source</span>
+          </div>
+
+          <div class="author-credit">
+            <span>Made with</span>
+            <span class="heart">❤️</span>
+            <span>by</span>
+            <strong>Mohamed AZGHARI</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal hidden">
+      <div class="modal-content glass-panel">
+        <div class="modal-header-compact">
+          <h3>Add Connection</h3>
+          <div class="segmented-control">
+            <button type="button" class="segment-btn active" data-tab="connection-tab">Connection</button>
+            <button type="button" class="segment-btn" data-tab="bastion-tab">
+              Bastion
+              <span id="bastion-status-dot" class="status-dot hidden"></span>
+            </button>
+          </div>
+        </div>
+
+        <form id="connection-form">
+          <div id="connection-tab" class="tab-content active">
+            <div class="form-group">
+              <label>Protocol</label>
+              <div class="protocol-selector">
+                <div class="protocol-option active" data-value="ssh">
+                  <i class="fas fa-terminal"></i>
+                  <span>SSH</span>
+                </div>
+                <div class="protocol-option" data-value="rdp">
+                  <i class="fas fa-desktop"></i>
+                  <span>RDP</span>
+                </div>
+                <div class="protocol-option" data-value="vnc">
+                  <i class="fas fa-tv"></i>
+                  <span>VNC</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Label</label>
+              <input type="text" id="label" placeholder="My Server">
+            </div>
+            <div class="form-row">
+              <div class="form-group flex-grow">
+                <label>Host</label>
+                <input type="text" id="host" placeholder="192.168.1.1">
+              </div>
+              <div class="form-group width-auto">
+                <label>Port</label>
+                <input type="number" id="port" value="22" style="width: 80px;">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>User</label>
+              <input type="text" id="user" placeholder="root">
+            </div>
+
+            <div class="form-group">
+              <label>Authentication Method</label>
+              <div class="auth-type-selector">
+                <div class="auth-option" data-value="password">
+                  <div class="auth-option-icon">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                  </div>
+                  <div class="auth-option-content">
+                    <div class="auth-option-title">Password</div>
+                  </div>
+                  <div class="auth-option-check">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </div>
+                </div>
+                <div class="auth-option" data-value="key">
+                  <div class="auth-option-icon">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path
+                        d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4">
+                      </path>
+                    </svg>
+                  </div>
+                  <div class="auth-option-content">
+                    <div class="auth-option-title">Private Key</div>
+                  </div>
+                  <div class="auth-option-check">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="auth-fields-container">
+              <div class="form-group auth-field" id="password-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="Enter your password">
+              </div>
+              <div class="form-group auth-field hidden" id="key-group">
+                <label>Private Key File</label>
+                <div class="file-input-wrapper">
+                  <input type="text" id="key-path" placeholder="Select your private key file" readonly>
+                  <button type="button" id="browse-key-btn" class="btn-icon-secondary">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="17 8 12 3 7 8"></polyline>
+                      <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div class="form-group auth-field hidden" id="passphrase-group">
+                <label>Key Passphrase <span class="optional-label">(Optional)</span></label>
+                <input type="password" id="passphrase" placeholder="Enter passphrase if key is encrypted">
+              </div>
+            </div>
+            <div class="form-group" id="color-group">
+              <label>Color Label</label>
+              <div class="color-picker">
+                <input type="radio" name="color" value="" id="color-none" checked>
+                <label for="color-none" class="color-option" style="--c: transparent; border: 1px solid #555"
+                  title="None"></label>
+
+                <input type="radio" name="color" value="#6366f1" id="color-indigo">
+                <label for="color-indigo" class="color-option" style="--c: #6366f1" title="Electric Indigo"></label>
+
+                <input type="radio" name="color" value="#a855f7" id="color-violet">
+                <label for="color-violet" class="color-option" style="--c: #a855f7" title="Vibrant Violet"></label>
+
+                <input type="radio" name="color" value="#06b6d4" id="color-cyan">
+                <label for="color-cyan" class="color-option" style="--c: #06b6d4" title="Cyber Cyan"></label>
+
+                <input type="radio" name="color" value="#10b981" id="color-emerald">
+                <label for="color-emerald" class="color-option" style="--c: #10b981" title="Emerald Glow"></label>
+
+                <input type="radio" name="color" value="#f59e0b" id="color-amber">
+                <label for="color-amber" class="color-option" style="--c: #f59e0b" title="Sunset Amber"></label>
+
+                <input type="radio" name="color" value="#f43f5e" id="color-rose">
+                <label for="color-rose" class="color-option" style="--c: #f43f5e" title="Rose Pulse"></label>
+
+                <input type="radio" name="color" value="#94a3b8" id="color-slate">
+                <label for="color-slate" class="color-option" style="--c: #94a3b8" title="Slate Mist"></label>
+              </div>
+            </div>
+          </div>
+
+          <div id="bastion-tab" class="tab-content hidden">
+            <div class="info-box">
+              <i class="fas fa-shield-alt"></i>
+              <p>Configure a jump host to access this connection through an intermediate server.</p>
+            </div>
+            <div class="form-group">
+              <label>Bastion Host</label>
+              <input type="text" id="bastion-host" placeholder="bastion.example.com">
+            </div>
+            <div class="form-group">
+              <label>Bastion User</label>
+              <input type="text" id="bastion-user" placeholder="root">
+            </div>
+            <div class="form-group">
+              <label>Bastion Key Path</label>
+              <div class="file-input-wrapper">
+                <input type="text" id="bastion-key-path" placeholder="Select bastion private key" readonly>
+                <button type="button" id="browse-bastion-key-btn" class="btn-icon-secondary">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" id="cancel-btn" class="btn-secondary">Cancel</button>
+            <button type="button" id="save-connection-btn" class="btn-primary">Save Connection</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="modal hidden">
+      <div class="modal-content">
+        <h3 id="delete-modal-title">Delete Connection?</h3>
+        <p id="delete-modal-message">Are you sure you want to delete this connection? This action cannot be undone.</p>
+        <div class="form-actions">
+          <button type="button" id="delete-cancel-btn" class="btn-secondary">Cancel</button>
+          <button type="button" id="delete-confirm-btn" class="btn-danger">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Snippet Delete Confirmation Modal -->
+    <div id="snippet-delete-modal" class="modal hidden">
+      <div class="modal-content">
+        <h3 id="snippet-delete-title">Delete Snippet?</h3>
+        <p id="snippet-delete-message">Are you sure you want to delete this snippet? This action cannot be undone.</p>
+        <div class="form-actions">
+          <button type="button" id="snippet-delete-cancel-btn" class="btn-secondary">Cancel</button>
+          <button type="button" id="snippet-delete-confirm-btn" class="btn-danger">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Broadcast Confirmation Modal -->
+    <div id="broadcast-modal" class="modal hidden">
+      <div class="modal-content">
+        <h3>Activate Broadcast Mode?</h3>
+        <p>This will send your keystrokes to <strong>ALL</strong> active terminals simultaneously. Use with extreme
+          caution.</p>
+        <div class="form-actions">
+          <button type="button" id="broadcast-cancel-btn" class="btn-secondary">Cancel</button>
+          <button type="button" id="broadcast-confirm-btn" class="btn-danger">Activate</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Logs Modal -->
+    <div id="logs-modal" class="modal hidden">
+      <div class="modal-content modal-xl">
+        <div class="modal-header">
+          <div class="header-left">
+            <h3>Session Logs</h3>
+          </div>
+          <button class="close-btn" id="close-logs-btn">✕</button>
+        </div>
+        <div class="logs-container">
+          <div class="logs-sidebar">
+            <div class="logs-sidebar-search">
+              <div class="search-input-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="log-file-search" placeholder="Search logs by name...">
+              </div>
+              <div class="filter-group">
+                <select id="log-timeframe-filter">
+                  <option value="all">All Time</option>
+                  <option value="today">Today</option>
+                  <option value="week">This Week</option>
+                  <option value="month">This Month</option>
+                  <option value="custom">Custom Range...</option>
+                </select>
+              </div>
+              <div id="custom-date-range" class="custom-date-range hidden">
+                <input type="date" id="log-start-date" title="Start Date">
+                <input type="date" id="log-end-date" title="End Date">
+              </div>
+            </div>
+            <div class="logs-sidebar-header">
+              <label class="checkbox-container">
+                <input type="checkbox" id="select-all-logs">
+                <span class="checkmark"></span>
+                Select All
+              </label>
+              <button id="delete-selected-logs-btn" class="btn-danger btn-xs hidden">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            </div>
+            <div id="logs-list" class="logs-list">
+              <!-- Logs will be injected here -->
+            </div>
+          </div>
+          <div class="logs-viewer">
+            <div class="log-viewer-toolbar">
+              <div class="toolbar-left">
+                <i class="fas fa-search" style="color: var(--text-secondary); font-size: 14px; opacity: 0.5;"></i>
+              </div>
+
+              <div id="log-search-bar" class="log-search-bar">
+                <i class="fas fa-search" style="color: var(--text-secondary); font-size: 12px;"></i>
+                <input type="text" id="log-content-search" placeholder="Find...">
+                <span id="log-search-count" class="search-count">0/0</span>
+                <button id="log-search-prev" class="search-nav-btn"><i class="fas fa-chevron-up"></i></button>
+                <button id="log-search-next" class="search-nav-btn"><i class="fas fa-chevron-down"></i></button>
+              </div>
+
+              <div class="toolbar-right">
+                <button id="download-log-btn" class="toolbar-btn" title="Download Log">
+                  <i class="fas fa-download"></i>
+                </button>
+              </div>
+            </div>
+            <div id="log-content" class="log-content-area terminal-theme">
+              <div class="log-empty-state">Select a log to view</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- Process Manager Modal -->
+  <div id="process-modal" class="modal hidden">
+    <div class="modal-content large">
+      <div class="modal-header">
+        <h3>Remote Process Manager</h3>
+        <div class="header-actions">
+          <button id="refresh-processes" class="btn-icon" title="Refresh"><i class="fas fa-sync"></i></button>
+          <button class="close-btn" id="close-process-header-btn">✕</button>
+        </div>
+      </div>
+      <div class="process-list-container">
+        <table id="process-table">
+          <thead>
+            <tr>
+              <th>PID</th>
+              <th>User</th>
+              <th>CPU%</th>
+              <th>MEM%</th>
+              <th>Command</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="process-list-body">
+            <!-- Processes will be injected here -->
+          </tbody>
+        </table>
+      </div>
+      <div class="form-actions">
+        <button type="button" id="close-process-modal" class="btn-secondary">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Preferences</h3>
+        <button class="close-btn" id="close-settings-btn">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="settings-section">
+          <div class="settings-section-title">Logging</div>
+          <div class="form-group checkbox-group">
+            <label class="checkbox-container">
+              Enable Logging by Default
+              <input type="checkbox" id="pref-default-logging">
+              <span class="checkmark"></span>
+            </label>
+          </div>
+          <div class="form-group">
+            <label>Log Rotation Size (MB)</label>
+            <input type="number" id="pref-log-rotation-size" min="1" max="1000">
+            <small class="form-text">Oldest logs will be deleted when total size exceeds this limit.</small>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-section-title">Security</div>
+          <div class="form-group">
+            <label>Auto-Lock Vault</label>
+            <select id="pref-vault-timeout" class="form-control">
+              <option value="0">Until I close the app</option>
+              <option value="5">5 Minutes</option>
+              <option value="15">15 Minutes</option>
+              <option value="30">30 Minutes</option>
+              <option value="60">1 Hour</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" id="save-settings-btn" class="btn-primary">Save Preferences</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Snippet Modal -->
+  <div id="snippet-modal" class="modal hidden" style="z-index: 1100;">
+    <div class="modal-content">
+      <h3>Edit Snippet</h3>
+      <form id="snippet-form">
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" id="snippet-name" required placeholder="e.g. Update System">
+        </div>
+        <div class="form-group">
+          <label>Command</label>
+          <textarea id="snippet-command" rows="5" class="code-editor" required
+            placeholder="sudo apt update && sudo apt upgrade -y"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" id="cancel-snippet-btn" class="btn-secondary">Cancel</button>
+          <button type="submit" class="btn-primary">Save Snippet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Vault Setup Modal -->
+  <div id="vault-setup-modal" class="modal hidden" style="z-index: 2000;">
+    <div class="modal-content">
+      <div class="modal-header-center">
+        <div class="lock-icon-large">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <h3>Secure Your Vault</h3>
+        <p class="text-secondary">Create a master password to encrypt your connections.</p>
+      </div>
+      <form id="vault-setup-form">
+        <div class="form-group">
+          <label>Master Password</label>
+          <input type="password" id="vault-setup-password" required placeholder="Enter a strong password" minlength="8">
+        </div>
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <input type="password" id="vault-setup-confirm" required placeholder="Repeat password">
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary full-width">Encrypt & Start</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Vault Unlock Modal -->
+  <div id="vault-unlock-modal" class="modal hidden" style="z-index: 2000;">
+    <div class="modal-content">
+      <div class="modal-header-center">
+        <div class="lock-icon-large">
+          <i class="fas fa-lock"></i>
+        </div>
+        <h3>Unlock Vault</h3>
+        <p class="text-secondary">Enter your master password to access connections.</p>
+      </div>
+      <form id="vault-unlock-form">
+        <div class="form-group">
+          <input type="password" id="vault-unlock-password" required placeholder="Master Password" autofocus>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary full-width">Unlock</button>
+        </div>
+        <div class="text-center mt-2">
+          <a href="#" id="vault-reset-link" class="text-danger text-small">Reset Vault (Deletes All Data)</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Decrypt Backup Modal -->
+  <div id="import-decrypt-modal" class="modal hidden" style="z-index: 2000;">
+    <div class="modal-content">
+      <div class="modal-header-center">
+        <div class="lock-icon-large">
+          <i class="fas fa-file-import"></i>
+        </div>
+        <h3>Decrypt Backup</h3>
+        <p class="text-secondary">Enter the password used to encrypt this backup file.</p>
+      </div>
+      <form id="import-decrypt-form">
+        <div class="form-group">
+          <input type="password" id="import-decrypt-password" required placeholder="Backup Password" autofocus>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary full-width">Decrypt & Import</button>
+          <button type="button" id="import-decrypt-cancel" class="btn-secondary full-width mt-2">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Export Password Modal -->
+  <div id="export-password-modal" class="modal hidden" style="z-index: 2000;">
+    <div class="modal-content">
+      <div class="modal-header-center">
+        <div class="lock-icon-large">
+          <i class="fas fa-file-export"></i>
+        </div>
+        <h3>Secure Export</h3>
+        <p class="text-secondary">Set a password to encrypt this backup file.</p>
+      </div>
+      <form id="export-password-form">
+        <div class="form-group">
+          <label>Backup Password</label>
+          <input type="password" id="export-password-input" required placeholder="Create a password" minlength="4"
+            autofocus>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary full-width">Encrypt & Export</button>
+          <button type="button" id="export-password-cancel" class="btn-secondary full-width mt-2">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Connection Action Menu (Dropdown) -->
+  <div id="action-menu" class="context-menu hidden">
+    <div class="menu-item" id="action-edit">Edit</div>
+    <div class="menu-item" id="action-clone">Clone</div>
+    <div class="menu-separator"></div>
+    <div class="menu-item text-danger" id="action-delete">Delete</div>
+  </div>
+
+  <!-- Context Menu -->
+  <div id="context-menu" class="context-menu hidden">
+    <div class="menu-item" id="ctx-copy">Copy</div>
+    <div class="menu-item" id="ctx-paste">Paste</div>
+    <div class="menu-separator"></div>
+    <div class="menu-item" id="ctx-copy-pass">Copy Password</div>
+    <div class="menu-item" id="ctx-paste-pass">Paste Password</div>
+  </div>
+
+  <!-- Tab Context Menu -->
+  <div id="tab-context-menu" class="context-menu hidden">
+    <div class="menu-item" id="tab-ctx-close">Close Tab</div>
+    <div class="menu-item" id="tab-ctx-close-all">Close All Tabs</div>
+    <div class="menu-separator"></div>
+    <div class="menu-item" id="tab-ctx-log">Log Session</div>
+  </div>
+
+  <script src="renderer.js"></script>
+
+</body>
+
+</html>

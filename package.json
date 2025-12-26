@@ -1,0 +1,56 @@
+{
+  "name": "owl",
+  "productName": "OWL",
+  "version": "1.0.0",
+  "description": "A simple SSH connection manager",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "rebuild": "electron-rebuild",
+    "build": "electron-packager . OWL --platform=linux --arch=x64 --out=dist --overwrite --icon=owl_logo.png --ignore='^/logs|^/coverage|^/.nyc_output|^/bash|^/Docker_explorer.txt|^/SECURITY_ANALYSIS.*\\.md|^/build_deb.js|^/owl.desktop|^/connections.json|^/owl_connections.*\\.json|^/snippets.json'",
+    "build:deb": "npm run build && node build_deb.js",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.owl.sshmanager",
+    "productName": "OWL",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!dist/*",
+      "!owl.desktop"
+    ],
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Network",
+      "icon": "owl_logo.png"
+    }
+  },
+  "keywords": [],
+  "author": "",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "node-pty": "^1.0.0",
+    "ssh2": "^1.17.0",
+    "xterm": "^5.3.0",
+    "xterm-addon-fit": "^0.8.0"
+  },
+  "devDependencies": {
+    "chai": "^4.5.0",
+    "electron": "^13.6.9",
+    "electron-builder": "^22.14.13",
+    "electron-installer-debian": "^3.2.0",
+    "electron-packager": "^15.2.0",
+    "electron-rebuild": "^3.2.9",
+    "jsdom": "^27.3.0",
+    "jsdom-global": "^3.0.2",
+    "mocha": "^8.4.0",
+    "nyc": "^15.1.0",
+    "sinon": "^11.1.2"
+  }
+}

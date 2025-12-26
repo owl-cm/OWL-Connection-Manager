@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OWL - Secure. Sleek. Seamless. | Connection Manager</title>
+    <meta name="description"
+        content="OWL is a premium, high-performance connection manager for power users. Secure, sleek, and seamless infrastructure management.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <nav>
+        <div class="logo-container">
+            <img src="owl_logo.png" alt="OWL Logo" class="logo-img">
+            <span class="logo-text">OWL</span>
+        </div>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#security">Security</a>
+            <a href="#download">Download</a>
+        </div>
+        <a href="#" id="nav-download-btn" class="btn btn-primary" style="padding: 0.6rem 1.5rem; font-size: 0.9rem;">
+            <i data-lucide="download"></i> Get OWL
+        </a>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <h1>Secure. Sleek.<br>Seamless.</h1>
+            <p>A high-performance connection manager for Linux. Secure, fast, and built for modern workflows.</p>
+
+            <div class="cta-group" id="download">
+                <div class="download-container">
+                    <select id="version-select" class="version-dropdown">
+                        <option value="">Loading...</option>
+                    </select>
+                    <a href="#" id="hero-download-btn" class="btn btn-primary">
+                        <i data-lucide="linux"></i> Download (.deb)
+                    </a>
+                </div>
+                <a href="https://github.com/mazghari9/OWL-Connection-Manager" class="btn btn-secondary">
+                    <i data-lucide="github"></i> View on GitHub
+                </a>
+            </div>
+
+            <div class="mockup-container">
+                <img src="owl_app_mockup.png" alt="OWL App Mockup" class="mockup-img">
+            </div>
+        </section>
+
+        <section class="features" id="features">
+            <div class="section-header">
+                <h2>Engineered for Excellence</h2>
+                <p>Manage your remote servers from a single, unified interface.</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i data-lucide="layout"></i></div>
+                    <h3>Modern Interface</h3>
+                    <p>A clean, dark-themed UI with smooth transitions and optimized layouts.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i data-lucide="shield-check"></i></div>
+                    <h3>Secure Storage</h3>
+                    <p>Local AES-256 encryption. Your credentials never leave your machine.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i data-lucide="terminal"></i></div>
+                    <h3>Terminal</h3>
+                    <p>Built on xterm.js with support for broadcast mode and bastion hosts.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i data-lucide="folder-tree"></i></div>
+                    <h3>File Manager</h3>
+                    <p>Integrated SFTP explorer with drag-and-drop support and directory insights.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i data-lucide="activity"></i></div>
+                    <h3>Monitoring</h3>
+                    <p>Real-time tracking for CPU, RAM, and Disk usage on remote hosts.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i data-lucide="command"></i></div>
+                    <h3>Automation</h3>
+                    <p>Quickly access snippets and common commands via the command palette.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="security-section" id="security">
+            <div class="security-content">
+                <span class="security-badge">AES-256 Encryption</span>
+                <h2>Secure by Design</h2>
+                <p>OWL uses industry-standard AES-256-GCM encryption to protect your connection details. All data is
+                    stored locally on your machine.</p>
+                <ul style="list-style: none; margin-top: 2rem; display: flex; flex-direction: column; gap: 1rem;">
+                    <li style="display: flex; align-items: center; gap: 1rem; color: var(--text-dim);">
+                        <i data-lucide="check-circle" style="color: #22c55e;"></i> Local-only storage (No Cloud)
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 1rem; color: var(--text-dim);">
+                        <i data-lucide="check-circle" style="color: #22c55e;"></i> Master Password Protection
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 1rem; color: var(--text-dim);">
+                        <i data-lucide="check-circle" style="color: #22c55e;"></i> Session Auto-Lock
+                    </li>
+                </ul>
+            </div>
+            <div class="security-visual" style="flex: 1; display: flex; justify-content: center;">
+                <div
+                    style="width: 300px; height: 300px; background: var(--primary-glow); border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 100px var(--primary-glow);">
+                    <i data-lucide="lock" size="100" style="color: white; z-index: 2;"></i>
+                    <div
+                        style="position: absolute; width: 100%; height: 100%; border: 2px dashed var(--primary); border-radius: 50%; animation: rotate 10s linear infinite;">
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="logo-container">
+                <img src="owl_logo.png" alt="OWL Logo" class="logo-img">
+                <span class="logo-text">OWL</span>
+            </div>
+            <div class="footer-links">
+                <a href="https://github.com/mazghari9/OWL-Connection-Manager">GitHub</a>
+                <a href="#">Documentation</a>
+                <a href="#">Privacy Policy</a>
+            </div>
+            <p class="copyright">© 2025 OWL Connection Manager. Created with ❤️ by Mohamed AZGHARI.</p>
+            <p class="copyright" style="font-size: 0.7rem; opacity: 0.5;">Licensed under Polyform Noncommercial License
+                1.0.0</p>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+    <style>
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</body>
+
+</html>
