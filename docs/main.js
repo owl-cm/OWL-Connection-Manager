@@ -30,12 +30,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Smooth scrolling for nav links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth'
-                });
+            const href = this.getAttribute('href');
+
+            // Only handle internal links that aren't just "#"
+            if (href.startsWith('#') && href.length > 1) {
+                try {
+                    const target = document.querySelector(href);
+                    if (target) {
+                        e.preventDefault();
+                        target.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                } catch (err) {
+                    // Ignore invalid selectors
+                }
             }
         });
     });
@@ -61,6 +70,9 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchReleases() {
         try {
             const response = await fetch(`https://api.github.com/repos/${REPO}/releases`);
+            if (!response.ok) {
+                throw new Error(`GitHub API returned ${response.status}`);
+            }
             const releases = await response.json();
 
             if (!Array.isArray(releases) || releases.length === 0) {
