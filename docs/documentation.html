@@ -12,7 +12,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=1.1">
+    <link rel="stylesheet" href="style.css?v=1.2">
     <style>
         /* Fallback critical styles to ensure layout works even if CSS is cached */
         .docs-container {
@@ -83,11 +83,11 @@
         </div>
         <div class="nav-links">
             <a href="index.html">Home</a>
-            <a href="#getting-started">Getting Started</a>
-            <a href="#features">Features</a>
+            <a href="#introduction">Introduction</a>
+            <a href="#installation">Installation</a>
             <a href="#security">Security</a>
         </div>
-        <a href="index.html#download" class="btn btn-primary" style="padding: 0.6rem 1.5rem; font-size: 0.9rem;">
+        <a href="#" id="nav-download-btn" class="btn btn-primary" style="padding: 0.6rem 1.5rem; font-size: 0.9rem;">
             <i data-lucide="download"></i> Download
         </a>
     </nav>
@@ -96,213 +96,231 @@
         <aside class="docs-sidebar">
             <div class="sidebar-nav">
                 <div class="sidebar-section">
-                    <h4>Introduction</h4>
+                    <h4>Getting Started</h4>
                     <div class="sidebar-links">
-                        <a href="#getting-started" class="active">Getting Started</a>
+                        <a href="#introduction" class="active">Introduction</a>
                         <a href="#installation">Installation</a>
                     </div>
                 </div>
                 <div class="sidebar-section">
-                    <h4>Core Features</h4>
+                    <h4>Core Security</h4>
                     <div class="sidebar-links">
-                        <a href="#connection-management">Connection Management</a>
-                        <a href="#terminal-capabilities">SSH Terminal</a>
-                        <a href="#file-explorer">SFTP File Explorer</a>
-                        <a href="#monitoring">Real-Time Monitoring</a>
+                        <a href="#security">Secure Vault</a>
+                        <a href="#master-password">Master Password</a>
+                        <a href="#auto-lock">Auto-Lock System</a>
                     </div>
                 </div>
                 <div class="sidebar-section">
-                    <h4>Advanced Tools</h4>
+                    <h4>Management</h4>
+                    <div class="sidebar-links">
+                        <a href="#connection-management">Connection Tree</a>
+                        <a href="#folders-labels">Folders & Labels</a>
+                        <a href="#smart-cloning">Smart Cloning</a>
+                    </div>
+                </div>
+                <div class="sidebar-section">
+                    <h4>Terminal & Protocols</h4>
+                    <div class="sidebar-links">
+                        <a href="#terminal-capabilities">SSH Terminal</a>
+                        <a href="#remote-protocols">RDP & VNC</a>
+                        <a href="#broadcast-mode">Broadcast Mode</a>
+                        <a href="#bastion-hosts">Bastion Support</a>
+                    </div>
+                </div>
+                <div class="sidebar-section">
+                    <h4>Remote Tools</h4>
+                    <div class="sidebar-links">
+                        <a href="#file-explorer">SFTP Explorer</a>
+                        <a href="#monitoring">Metrics & Processes</a>
+                    </div>
+                </div>
+                <div class="sidebar-section">
+                    <h4>Advanced</h4>
                     <div class="sidebar-links">
                         <a href="#command-palette">Command Palette</a>
-                        <a href="#broadcast-mode">Broadcast Mode</a>
+                        <a href="#snippets">Command Snippets</a>
                         <a href="#session-logging">Session Logging</a>
                         <a href="#backups">Backups & Migration</a>
-                    </div>
-                </div>
-                <div class="sidebar-section">
-                    <h4>Security</h4>
-                    <div class="sidebar-links">
-                        <a href="#secure-vault">Secure Vault</a>
-                        <a href="#master-password">Master Password</a>
-                        <a href="#auto-lock">Auto-Lock Timer</a>
                     </div>
                 </div>
             </div>
         </aside>
 
         <main class="docs-content">
-            <section id="getting-started">
+            <section id="introduction">
                 <h1>Documentation</h1>
-                <p>Welcome to the official documentation for <strong>OWL Connection Manager</strong>. OWL is a premium,
-                    high-performance tool designed for power users who manage remote infrastructure. This guide covers
-                    everything from basic setup to advanced features.</p>
+                <p>OWL is a professional-grade connection manager designed for system administrators and power users. It
+                    provides a unified, secure, and aesthetically superior environment for managing remote
+                    infrastructure across multiple protocols.</p>
 
-                <div class="info-box">
-                    <h5>Pro Tip</h5>
-                    <p>Use <code>Ctrl + Shift + P</code> within the application to open the Command Palette for quick
-                        access to all features.</p>
-                </div>
+                <p>This documentation provides a comprehensive technical overview of OWL's architecture, security model,
+                    and feature set. Whether you are managing a single server or a complex multi-cloud environment, OWL
+                    is engineered to streamline your workflow.</p>
+            </section>
 
-                <h2 id="installation"><i data-lucide="download-cloud"></i> Installation</h2>
-                <p>OWL is currently optimized for Linux environments. You can install it using the Debian package or run
-                    it from source.</p>
+            <section id="installation">
+                <h2><i data-lucide="download-cloud"></i> Installation</h2>
+                <p>OWL is natively optimized for Linux distributions. Follow the instructions below to deploy OWL on
+                    your workstation.</p>
 
-                <h3>Debian Package (.deb)</h3>
-                <ol>
-                    <li>Download the latest <code>.deb</code> file from the <a href="index.html#download">Home Page</a>.
-                    </li>
-                    <li>Install it using your package manager:
-                        <pre><code>sudo dpkg -i owl-connection-manager_*.deb
-sudo apt-get install -f</code></pre>
-                    </li>
-                </ol>
+                <h3>Debian-based Distributions (.deb)</h3>
+                <p>The recommended way to install OWL on Ubuntu, Debian, or Linux Mint is via the official package. You
+                    can download the latest stable release from <a href="#" id="direct-download-link"
+                        style="color: var(--primary); font-weight: 600;">here</a>.</p>
 
-                <h3>From Source</h3>
-                <pre><code>git clone https://github.com/owl-cm/OWL-Connection-Manager.git
+                <p>Once downloaded, execute the following commands in your terminal:</p>
+                <pre><code>sudo dpkg -i owl-connection-manager_*.deb
+sudo apt-get install -f # To resolve any missing dependencies</code></pre>
+
+                <h3>Building from Source</h3>
+                <p>For developers or users on other distributions, OWL can be compiled from source. Ensure you have
+                    Node.js (v16+) and npm installed.</p>
+                <pre><code># Clone the repository
+git clone https://github.com/owl-cm/OWL-Connection-Manager.git
+
+# Navigate to the directory
 cd OWL-Connection-Manager
+
+# Install dependencies
 npm install
+
+# Launch the application
 npm start</code></pre>
+            </section>
+
+            <section id="security">
+                <h2><i data-lucide="shield-check"></i> Security Architecture</h2>
+                <p>Security is the core pillar of OWL. The application is designed with a zero-trust approach to
+                    credential management, ensuring that your sensitive data never leaves your local machine.</p>
+
+                <h3 id="secure-vault">The Secure Vault</h3>
+                <p>All connection metadata, including passwords, private key paths, and passphrases, is stored in a
+                    local JSON vault. This vault is encrypted using <strong>AES-256-GCM</strong> (Galois/Counter Mode),
+                    providing both confidentiality and authenticity.</p>
+
+                <h3 id="master-password">Master Password & Key Derivation</h3>
+                <p>Upon initial launch, you are required to establish a Master Password. OWL uses the
+                    <strong>PBKDF2</strong> (Password-Based Key Derivation Function 2) algorithm with <strong>100,000
+                        iterations</strong> and a unique salt to derive the encryption key. </p>
+                <p><strong>Important:</strong> OWL does not store your Master Password. If lost, the encrypted vault
+                    cannot be recovered.</p>
+
+                <h3 id="auto-lock">Session Auto-Lock</h3>
+                <p>To protect against unauthorized physical access, OWL includes a configurable inactivity timer. When
+                    triggered, the application securely clears the encryption key from memory and returns to the lock
+                    screen, requiring the Master Password to resume operations.</p>
             </section>
 
             <section id="connection-management">
                 <h2><i data-lucide="share-2"></i> Connection Management</h2>
-                <p>OWL provides a powerful tree-based system for organizing your connections. You can group servers into
-                    folders, drag and drop them to reorder, and use color labels for quick identification.</p>
+                <p>OWL features a sophisticated hierarchical management system that allows you to organize thousands of
+                    connections with ease.</p>
 
-                <h3>Smart Folders</h3>
-                <p>Create nested folders to mirror your infrastructure. For example, you can have a "Production" folder
-                    with subfolders for "Web Servers" and "Database Servers".</p>
+                <h3 id="folders-labels">Hierarchical Organization & Labels</h3>
+                <p>Connections can be organized into nested folders, allowing you to mirror your infrastructure's
+                    logical layout (e.g., Region > Environment > Service). </p>
+                <p>Use <strong>Color Labels</strong> to categorize connections by importance or environment (e.g., Red
+                    for Production, Green for Development). These labels provide instant visual cues in the connection
+                    tree and terminal tabs.</p>
 
-                <h3>Connection Labels</h3>
-                <p>Assign colors to connections to visually distinguish between environments:</p>
-                <ul>
-                    <li><span style="color: #ef4444;">Red</span>: Production</li>
-                    <li><span style="color: #eab308;">Yellow</span>: Staging</li>
-                    <li><span style="color: #22c55e;">Green</span>: Development</li>
-                </ul>
-
-                <h3>Smart Cloning</h3>
-                <p>Quickly duplicate a connection configuration. The "Smart Clone" feature automatically places the new
-                    connection in the same folder as the original.</p>
+                <h3 id="smart-cloning">Smart Cloning</h3>
+                <p>The Smart Cloning feature allows you to duplicate existing connection configurations with a single
+                    click. The cloned connection inherits all settings (excluding unique identifiers) and is
+                    automatically placed within the same parent folder, significantly reducing setup time for server
+                    clusters.</p>
             </section>
 
             <section id="terminal-capabilities">
-                <h2><i data-lucide="terminal"></i> SSH & Remote Protocols</h2>
-                <p>The heart of OWL is its high-performance terminal emulator and multi-protocol support.</p>
+                <h2><i data-lucide="terminal"></i> Terminal & Remote Protocols</h2>
+                <p>OWL provides a high-performance terminal experience and integrated support for graphical remote
+                    access.</p>
 
-                <h3>Supported Protocols</h3>
+                <h3>High-Performance SSH</h3>
+                <p>Built on <code>xterm.js</code> and <code>node-pty</code>, the SSH terminal supports:</p>
                 <ul>
-                    <li><strong>SSH</strong>: Full-featured terminal with xterm.js support.</li>
-                    <li><strong>RDP</strong>: Connect to Windows machines with integrated Remote Desktop support.</li>
-                    <li><strong>VNC</strong>: Access graphical Linux or macOS sessions via VNC.</li>
+                    <li><strong>True Color (24-bit)</strong> support for modern CLI tools.</li>
+                    <li><strong>Full Mouse Integration</strong> for applications like <code>htop</code>,
+                        <code>vim</code>, and <code>tmux</code>.</li>
+                    <li><strong>Automated Authentication</strong>: Seamless handling of password prompts and SSH agent
+                        integration.</li>
                 </ul>
 
-                <h3>Terminal Features</h3>
-                <ul>
-                    <li><strong>Full Color Support</strong>: Supports 256-color and true-color themes.</li>
-                    <li><strong>Mouse Events</strong>: Interact with terminal applications like <code>htop</code> or
-                        <code>vim</code> using your mouse.
-                    </li>
-                    <li><strong>Automated Login</strong>: OWL intelligently handles password prompts and SSH key
-                        passphrases.</li>
-                    <li><strong>Host Fingerprints</strong>: Automatically handles "Are you sure you want to continue
-                        connecting?" prompts for new hosts.</li>
-                </ul>
+                <h3 id="remote-protocols">RDP & VNC Support</h3>
+                <p>Beyond the terminal, OWL integrates RDP (Remote Desktop Protocol) and VNC support, allowing you to
+                    manage Windows and graphical Linux environments from the same unified interface.</p>
 
-                <h3 id="broadcast-mode">Broadcast Mode</h3>
-                <p>One of OWL's most powerful features. When enabled, any command you type in the active terminal is
-                    simultaneously sent to all other open terminal sessions. This is ideal for updating multiple servers
-                    at once.</p>
+                <h3 id="broadcast-mode">Broadcast Mode (Multi-Exec)</h3>
+                <p>Broadcast Mode allows you to synchronize input across all active terminal sessions. Commands typed in
+                    the primary pane are instantly executed on all other connected hosts, making it an essential tool
+                    for fleet-wide updates or configuration checks.</p>
 
-                <h3 id="bastion-hosts">Bastion / Jump Hosts</h3>
-                <p>Connect securely to servers behind firewalls using integrated ProxyJump support. Simply configure the
-                    Bastion details in the connection modal.</p>
+                <h3 id="bastion-hosts">Bastion & Jump Host Integration</h3>
+                <p>OWL simplifies access to private networks through integrated <strong>ProxyJump</strong> support. You
+                    can configure a Bastion host as a gateway, and OWL will automatically handle the multi-hop SSH
+                    tunnel transparently.</p>
             </section>
 
             <section id="file-explorer">
                 <h2><i data-lucide="folder-tree"></i> SFTP File Explorer</h2>
-                <p>Manage remote files without leaving the application. The integrated SFTP explorer provides a
-                    graphical interface for your remote filesystem.</p>
+                <p>The integrated SFTP explorer provides a powerful graphical interface for remote file management,
+                    eliminating the need for external clients.</p>
 
-                <h3>Capabilities</h3>
                 <ul>
-                    <li><strong>Drag-and-Drop</strong>: Upload files by dragging them from your local machine into the
-                        explorer.</li>
-                    <li><strong>Directory Insights</strong>: Instantly calculate the size of remote directories with a
-                        single click.</li>
-                    <li><strong>File Operations</strong>: Rename, delete, and download files with ease.</li>
-                    <li><strong>Breadcrumb Navigation</strong>: Quickly jump between parent directories.</li>
+                    <li><strong>Drag-and-Drop</strong>: Seamlessly upload files and directories by dragging them from
+                        your local file manager.</li>
+                    <li><strong>Directory Insights</strong>: Instantly calculate remote directory sizes using optimized
+                        background processes.</li>
+                    <li><strong>Breadcrumb Navigation</strong>: Rapidly navigate complex remote filesystems with an
+                        interactive path bar.</li>
                 </ul>
             </section>
 
             <section id="monitoring">
-                <h2><i data-lucide="activity"></i> Real-Time Monitoring</h2>
-                <p>Keep an eye on your server's health with live metrics and process management.</p>
+                <h2><i data-lucide="activity"></i> Real-Time Monitoring & Insights</h2>
+                <p>Gain immediate visibility into the health and performance of your remote systems without executing
+                    manual commands.</p>
 
                 <h3>Metrics Dashboard</h3>
-                <p>View live graphs and values for:</p>
+                <p>OWL streams real-time telemetry from connected hosts, providing live visualizations for:</p>
                 <ul>
-                    <li><strong>CPU Usage</strong>: Real-time percentage of processor load.</li>
-                    <li><strong>RAM Usage</strong>: Monitor memory consumption.</li>
-                    <li><strong>Disk Usage</strong>: Track available space on the root partition.</li>
+                    <li><strong>CPU Load</strong>: Per-core and aggregate utilization.</li>
+                    <li><strong>Memory Usage</strong>: Detailed breakdown of RAM and Swap usage.</li>
+                    <li><strong>Disk I/O & Capacity</strong>: Real-time tracking of storage availability.</li>
                 </ul>
 
                 <h3>Remote Process Manager</h3>
-                <p>A full-featured task manager for your remote server. Search for processes, view their resource usage,
-                    and terminate them directly from the UI.</p>
+                <p>The built-in Process Manager allows you to monitor running tasks on the remote host. You can search
+                    for specific processes, sort by resource consumption, and terminate (kill) processes directly from
+                    the UI.</p>
             </section>
 
-            <section id="security">
-                <h2><i data-lucide="shield-check"></i> Security</h2>
-                <p>Security is not an afterthought in OWL; it's the foundation. We use industry-standard encryption to
-                    ensure your data stays private.</p>
+            <section id="advanced-features">
+                <h2><i data-lucide="cpu"></i> Advanced Management Features</h2>
 
-                <h3 id="secure-vault">Secure Vault</h3>
-                <p>All sensitive data, including passwords, private key paths, and passphrases, is stored in a local
-                    vault. This vault is encrypted using <strong>AES-256-GCM</strong>.</p>
+                <h3 id="command-palette">Command Palette</h3>
+                <p>The Command Palette (<code>Ctrl + Shift + P</code>) is the central nervous system of OWL. It provides
+                    a searchable, keyboard-driven interface to access every feature, connection, and snippet within the
+                    application.</p>
 
-                <h3 id="master-password">Master Password</h3>
-                <p>When you first launch OWL, you'll be asked to set a Master Password. This password is used to derive
-                    the encryption key for your vault using <strong>PBKDF2</strong> with 100,000 iterations. <strong>OWL
-                        never stores your master password.</strong></p>
+                <h3 id="snippets">Command Snippets</h3>
+                <p>Save frequently used commands or complex scripts as Snippets. Snippets can be executed with a single
+                    click or through the Command Palette, ensuring consistency and reducing the risk of manual entry
+                    errors.</p>
 
-                <h3 id="auto-lock">Auto-Lock Timer</h3>
-                <p>For enhanced security, you can configure an auto-lock timer. If the application is idle for a
-                    specified period, it will automatically lock the vault and require your master password to resume.
-                </p>
-            </section>
-
-            <section id="advanced-tools">
-                <h2><i data-lucide="cpu"></i> Advanced Tools</h2>
-
-                <h3 id="command-palette">Command Palette & Snippets</h3>
-                <p>Access any feature or snippet by pressing <code>Ctrl + Shift + P</code>. The palette is searchable
-                    and designed for a keyboard-centric workflow.</p>
-
-                <h3>Command Snippets</h3>
-                <p>Save frequently used commands as snippets for one-click execution. Snippets can be managed directly
-                    from the Command Palette or the dedicated Snippets manager.</p>
+                <h3 id="session-logging">Advanced Session Logging</h3>
+                <p>OWL can automatically record every terminal session for auditing and compliance. The built-in Log
+                    Viewer features:</p>
                 <ul>
-                    <li><strong>Quick Execution</strong>: Run snippets on any active terminal session.</li>
-                    <li><strong>Organization</strong>: Categorize snippets for different tasks (e.g., Docker, Git,
-                        System Maintenance).</li>
+                    <li><strong>Timeframe Filtering</strong>: Quickly locate logs from specific dates or ranges.</li>
+                    <li><strong>Full-Text Search</strong>: Search through thousands of lines of log data instantly.</li>
+                    <li><strong>Log Rotation</strong>: Automated management of log file sizes to prevent local disk
+                        exhaustion.</li>
                 </ul>
 
-                <h3 id="session-logging">Session Logging</h3>
-                <p>Automatically log all terminal output for auditing or debugging. OWL includes a built-in log viewer
-                    with advanced filtering:</p>
-                <ul>
-                    <li><strong>Timeframe Filters</strong>: View logs from today, this week, or a custom date range.
-                    </li>
-                    <li><strong>In-Log Search</strong>: Find specific text within a log file instantly.</li>
-                    <li><strong>Log Rotation</strong>: Automatically rotate log files when they reach a certain size
-                        (e.g., 100MB) to save disk space.</li>
-                </ul>
-
-                <h3 id="backups">Backups & Migration</h3>
-                <p>Export your entire configuration to an encrypted backup file. This makes it easy to move your
-                    connections to a new machine securely.</p>
+                <h3 id="backups">Encrypted Backups</h3>
+                <p>Export your entire OWL configuration, including connections and snippets, into a single encrypted
+                    backup file. This allows for secure migration between workstations while maintaining the integrity
+                    of your sensitive data.</p>
             </section>
         </main>
     </div>
@@ -322,6 +340,29 @@ npm start</code></pre>
     <script>
         lucide.createIcons();
 
+        // GitHub Releases Integration for Documentation
+        const REPO = 'owl-cm/OWL-Connection-Manager';
+        const directDownloadLink = document.getElementById('direct-download-link');
+        const navDownloadBtn = document.getElementById('nav-download-btn');
+
+        async function fetchLatestRelease() {
+            try {
+                const response = await fetch(`https://api.github.com/repos/${REPO}/releases/latest`);
+                if (!response.ok) throw new Error('Failed to fetch');
+                const release = await response.json();
+                const debAsset = release.assets.find(asset => asset.name.endsWith('.deb'));
+                if (debAsset) {
+                    directDownloadLink.href = debAsset.browser_download_url;
+                    navDownloadBtn.href = debAsset.browser_download_url;
+                }
+            } catch (error) {
+                console.error('Error fetching latest release:', error);
+                directDownloadLink.href = 'https://github.com/' + REPO + '/releases';
+                navDownloadBtn.href = 'https://github.com/' + REPO + '/releases';
+            }
+        }
+        fetchLatestRelease();
+
         // Smooth scrolling for sidebar links
         document.querySelectorAll('.sidebar-links a').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
@@ -331,7 +372,7 @@ npm start</code></pre>
 
                 if (targetElement) {
                     window.scrollTo({
-                        top: targetElement.offsetTop - 100,
+                        top: targetElement.offsetTop - 120,
                         behavior: 'smooth'
                     });
 
