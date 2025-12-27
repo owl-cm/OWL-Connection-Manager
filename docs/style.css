@@ -384,3 +384,163 @@ footer {
         text-align: center;
     }
 }
+
+/* Documentation Layout */
+.docs-container {
+    display: flex;
+    min-height: 100vh;
+    padding-top: 80px;
+}
+
+.docs-sidebar {
+    width: 300px;
+    height: calc(100vh - 80px);
+    position: fixed;
+    left: 0;
+    top: 80px;
+    background: rgba(10, 10, 12, 0.5);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid var(--border-glass);
+    padding: 2rem;
+    overflow-y: auto;
+    z-index: 90;
+}
+
+.docs-content {
+    flex: 1;
+    margin-left: 300px;
+    padding: 4rem 10% 8rem 10%;
+    max-width: 1200px;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.sidebar-section h4 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--primary);
+    margin-bottom: 1rem;
+    opacity: 0.8;
+}
+
+.sidebar-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.sidebar-links a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: var(--transition);
+}
+
+.sidebar-links a:hover,
+.sidebar-links a.active {
+    color: var(--text-main);
+    background: var(--bg-card);
+}
+
+.sidebar-links a.active {
+    border-left: 2px solid var(--primary);
+}
+
+/* Documentation Content Typography */
+.docs-content h1 {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(to right, #fff, var(--primary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.docs-content h2 {
+    font-size: 2.25rem;
+    margin: 3rem 0 1.5rem 0;
+    color: var(--text-main);
+}
+
+.docs-content h3 {
+    font-size: 1.5rem;
+    margin: 2rem 0 1rem 0;
+    color: var(--text-main);
+}
+
+.docs-content p {
+    font-size: 1.1rem;
+    color: var(--text-dim);
+    margin-bottom: 1.5rem;
+    line-height: 1.8;
+}
+
+.docs-content ul,
+.docs-content ol {
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+    color: var(--text-dim);
+}
+
+.docs-content li {
+    margin-bottom: 0.5rem;
+}
+
+/* Code Blocks */
+pre {
+    background: #0d0d0f;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-glass);
+    overflow-x: auto;
+    margin: 1.5rem 0;
+}
+
+code {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.9rem;
+    color: var(--accent);
+}
+
+pre code {
+    color: var(--text-main);
+}
+
+/* Info Boxes */
+.info-box {
+    background: rgba(139, 92, 246, 0.1);
+    border-left: 4px solid var(--primary);
+    padding: 1.5rem;
+    border-radius: 0 12px 12px 0;
+    margin: 2rem 0;
+}
+
+.info-box h5 {
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.info-box p {
+    margin-bottom: 0;
+    font-size: 0.95rem;
+}
+
+/* Responsive Docs */
+@media (max-width: 1024px) {
+    .docs-sidebar {
+        display: none;
+    }
+
+    .docs-content {
+        margin-left: 0;
+        padding: 4rem 5%;
+    }
+}
