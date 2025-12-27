@@ -12,7 +12,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=1.2">
+    <link rel="stylesheet" href="style.css">
     <style>
         /* Fallback critical styles to ensure layout works even if CSS is cached */
         .docs-container {
@@ -201,7 +201,8 @@ npm start</code></pre>
                 <h3 id="master-password">Master Password & Key Derivation</h3>
                 <p>Upon initial launch, you are required to establish a Master Password. OWL uses the
                     <strong>PBKDF2</strong> (Password-Based Key Derivation Function 2) algorithm with <strong>100,000
-                        iterations</strong> and a unique salt to derive the encryption key. </p>
+                        iterations</strong> and a unique salt to derive the encryption key.
+                </p>
                 <p><strong>Important:</strong> OWL does not store your Master Password. If lost, the encrypted vault
                     cannot be recovered.</p>
 
@@ -240,7 +241,8 @@ npm start</code></pre>
                 <ul>
                     <li><strong>True Color (24-bit)</strong> support for modern CLI tools.</li>
                     <li><strong>Full Mouse Integration</strong> for applications like <code>htop</code>,
-                        <code>vim</code>, and <code>tmux</code>.</li>
+                        <code>vim</code>, and <code>tmux</code>.
+                    </li>
                     <li><strong>Automated Authentication</strong>: Seamless handling of password prompts and SSH agent
                         integration.</li>
                 </ul>
@@ -385,23 +387,31 @@ npm start</code></pre>
 
         // Update active link on scroll
         window.addEventListener('scroll', () => {
-            const sections = document.querySelectorAll('section');
             const navLinks = document.querySelectorAll('.sidebar-links a');
+            const scrollPos = window.pageYOffset || document.documentElement.scrollTop;
 
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                if (pageYOffset >= sectionTop - 150) {
-                    current = section.getAttribute('id');
+            let currentId = '';
+
+            navLinks.forEach(link => {
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+
+                if (targetElement) {
+                    const rect = targetElement.getBoundingClientRect();
+                    const offsetTop = rect.top + scrollPos - 160;
+
+                    if (scrollPos >= offsetTop) {
+                        currentId = targetId;
+                    }
                 }
             });
 
-            navLinks.forEach(a => {
-                a.classList.remove('active');
-                if (a.getAttribute('href').substring(1) === current) {
-                    a.classList.add('active');
-                }
-            });
+            if (currentId) {
+                navLinks.forEach(a => {
+                    const isCurrent = a.getAttribute('href').substring(1) === currentId;
+                    a.classList.toggle('active', isCurrent);
+                });
+            }
         });
     </script>
 </body>
