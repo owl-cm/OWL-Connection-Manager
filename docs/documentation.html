@@ -12,7 +12,59 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=1.1">
+    <style>
+        /* Fallback critical styles to ensure layout works even if CSS is cached */
+        .docs-container {
+            display: flex;
+            min-height: 100vh;
+            padding-top: 100px;
+        }
+
+        .docs-sidebar {
+            width: 320px;
+            height: calc(100vh - 100px);
+            position: fixed;
+            left: 0;
+            top: 100px;
+            background: rgba(10, 10, 12, 0.4);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2.5rem;
+            overflow-y: auto;
+            z-index: 90;
+        }
+
+        .docs-content {
+            flex: 1;
+            margin-left: 320px;
+            padding: 4rem 8% 8rem 8%;
+            max-width: 1300px;
+        }
+
+        .sidebar-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            display: block;
+            padding: 0.6rem 1rem;
+            border-radius: 10px;
+        }
+
+        .sidebar-links a.active {
+            background: rgba(255, 255, 255, 0.03);
+            color: #f8fafc;
+        }
+
+        @media (max-width: 1024px) {
+            .docs-sidebar {
+                display: none;
+            }
+
+            .docs-content {
+                margin-left: 0;
+            }
+        }
+    </style>
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
