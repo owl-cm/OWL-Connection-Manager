@@ -771,12 +771,27 @@ explorerRefreshBtn.onclick = () => {
 
 explorerUploadBtn.onclick = async () => {
     const session = sessions[activeSessionId];
-    if (!session) return;
-    const success = await ipcRenderer.invoke('sftp-upload', {
-        connection: session.connection,
-        remoteDir: session.currentPath
-    });
-    if (success) loadRemoteFiles(session.currentPath);
+    if (!session) {
+        showNotification('Upload Failed', 'No active session', 'error');
+        return;
+    }
+
+    try {
+        const success = await ipcRenderer.invoke('sftp-upload', {
+            connection: session.connection,
+            remoteDir: session.currentPath
+        });
+
+        if (success) {
+            showNotification('Upload Successful', 'File uploaded successfully', 'success');
+            loadRemoteFiles(session.currentPath);
+        } else {
+            showNotification('Upload Cancelled', 'File upload was cancelled', 'error');
+        }
+    } catch (error) {
+        console.error('Upload error:', error);
+        showNotification('Upload Failed', error.message || 'Failed to upload file', 'error');
+    }
 };
 
 // Initial dock button state
