@@ -903,6 +903,14 @@ body {
   color: white;
 }
 
+.menu-item.disabled {
+  opacity: 0.3;
+  filter: grayscale(1) brightness(0.5);
+  pointer-events: none;
+  cursor: default;
+  color: var(--text-secondary);
+}
+
 .menu-separator {
   height: 1px;
   background: var(--glass-border);

@@ -549,6 +549,7 @@ ipcMain.on('terminal-create', (event, { connection, cols, rows }) => {
   });
 
   const pid = ptyProcess.pid;
+  console.log(`[Terminal] Created PTY for PID ${pid} (${cols}x${rows})`);
   terminals[pid] = ptyProcess;
 
   // Password Auto-login Logic
@@ -618,6 +619,7 @@ ipcMain.on('terminal-write', (event, { pid, data }) => {
 
 ipcMain.on('terminal-resize', (event, { pid, cols, rows }) => {
   if (terminals[pid]) {
+    console.log(`[Terminal] Resizing PID ${pid} to ${cols}x${rows}`);
     terminals[pid].resize(cols, rows);
   }
 });
@@ -1008,7 +1010,19 @@ ipcMain.handle('get-metrics', async (event, { connection }) => {
       echo "$cpu|$ram|$disk|$uptime|$os"
     `;
 
-    const { data } = await execQueued(connection, cmd);
+    let data;
+    if (connection && connection.id === 'local-terminal') {
+      const { exec } = require('child_process');
+      data = await new Promise((resolve, reject) => {
+        exec(cmd, (error, stdout, stderr) => {
+          if (error) reject(error);
+          else resolve(stdout);
+        });
+      });
+    } else {
+      const result = await execQueued(connection, cmd);
+      data = result.data;
+    }
 
     const parts = data.trim().split('|');
     if (parts.length >= 5) {
@@ -1031,7 +1045,19 @@ ipcMain.handle('get-dir-size', async (event, { connection, path }) => {
   try {
     const cmd = `du -sh ${escapeShellArg(path)} 2>/dev/null | cut -f1`;
 
-    const { data } = await execQueued(connection, cmd);
+    let data;
+    if (connection && connection.id === 'local-terminal') {
+      const { exec } = require('child_process');
+      data = await new Promise((resolve, reject) => {
+        exec(cmd, (error, stdout, stderr) => {
+          if (error) reject(error);
+          else resolve(stdout);
+        });
+      });
+    } else {
+      const result = await execQueued(connection, cmd);
+      data = result.data;
+    }
 
     return data.trim() || '0';
   } catch (err) {
@@ -1043,7 +1069,20 @@ ipcMain.handle('get-dir-size', async (event, { connection, path }) => {
 ipcMain.handle('get-processes', async (event, { connection }) => {
   try {
     const cmd = `ps -eo pid,user,pcpu,pmem,comm --sort=-pcpu | head -n 20 | tail -n +2`;
-    const { data } = await execQueued(connection, cmd);
+
+    let data;
+    if (connection && connection.id === 'local-terminal') {
+      const { exec } = require('child_process');
+      data = await new Promise((resolve, reject) => {
+        exec(cmd, (error, stdout, stderr) => {
+          if (error) reject(error);
+          else resolve(stdout);
+        });
+      });
+    } else {
+      const result = await execQueued(connection, cmd);
+      data = result.data;
+    }
 
     return data.trim().split('\n').map(line => {
       const [pid, user, cpu, mem, ...comm] = line.trim().split(/\s+/);
