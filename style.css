@@ -3811,3 +3811,613 @@ body {
 .vault-timer.hidden {
   display: none;
 }
+
+/* Export Selection Tree Styling */
+.export-selection-wrapper {
+  background: rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+  margin-bottom: 20px !important;
+  max-height: 350px !important;
+  overflow-y: auto;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.export-tree-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.export-tree-item {
+  margin-bottom: 4px;
+}
+
+.export-item-row {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.export-item-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Custom Checkbox */
+.export-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--text-secondary);
+  border-radius: 4px;
+  margin-right: 12px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: transparent;
+  flex-shrink: 0;
+}
+
+.export-checkbox:checked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.export-checkbox:checked::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 4px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.export-label {
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  user-select: none;
+}
+
+.export-label i {
+  margin-right: 10px !important;
+  font-size: 16px;
+  filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.3));
+}
+
+.export-child-container {
+  margin-left: 28px !important;
+  padding-left: 12px;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 4px;
+}
+
+/* Select All Header */
+.export-selection-wrapper>div:first-child {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  margin-bottom: 12px !important;
+  padding-bottom: 12px !important;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  user-select: none;
+}
+
+.checkbox-container input {
+  display: none;
+}
+
+.checkbox-container .checkmark {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--text-secondary);
+  border-radius: 4px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.checkbox-container input:checked~.checkmark {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.checkbox-container input:checked~.checkmark::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 4px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* --- Pro Export Modal Design --- */
+
+#export-password-modal .modal-content {
+  max-width: 650px;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.7);
+}
+
+.export-selection-wrapper {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 16px !important;
+  padding: 0 !important;
+  /* Header and list handle padding */
+  margin-bottom: 24px !important;
+  max-height: 400px !important;
+  overflow: hidden;
+  /* Header sticky */
+  display: flex;
+  flex-direction: column;
+}
+
+.export-selection-header {
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+.header-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Search Input */
+.export-search-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+.export-search-wrapper i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.export-search-wrapper input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 8px 12px 8px 36px;
+  color: var(--text-primary);
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.export-search-wrapper input:focus {
+  background: rgba(0, 0, 0, 0.4);
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+/* Tree Container */
+#export-selection-container {
+  overflow-y: auto;
+  padding: 12px;
+  flex: 1;
+}
+
+/* List Items */
+.export-tree-item {
+  margin-bottom: 2px;
+}
+
+.export-item-row {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.export-item-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.05);
+  transform: translateX(2px);
+}
+
+/* Checkbox Pro Style */
+.export-checkbox {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(148, 163, 184, 0.4);
+  border-radius: 6px;
+  margin-right: 14px;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.export-checkbox:checked {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: scale(1.05);
+  box-shadow: 0 2px 5px rgba(99, 102, 241, 0.4);
+}
+
+.export-checkbox:checked::after {
+  left: 6px;
+  top: 2px;
+  width: 4px;
+  height: 10px;
+  border-width: 0 2px 2px 0;
+}
+
+/* Labels & Icons */
+.export-label {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  color: #e2e8f0;
+}
+
+.export-label i {
+  font-size: 16px;
+  margin-right: 12px !important;
+  transition: transform 0.2s;
+}
+
+.export-item-row:hover .export-label i {
+  transform: scale(1.1);
+}
+
+/* Folder vs Server Colors */
+.export-label .fa-folder {
+  color: #fbbf24 !important;
+  /* Amber 400 */
+  filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.2));
+}
+
+.export-label .fa-server {
+  color: #a855f7 !important;
+  /* Purple 500 */
+  filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.2));
+}
+
+/* Hierarchy Lines */
+.export-child-container {
+  margin-left: 29px !important;
+  padding-left: 16px;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 2px;
+}
+
+/* Select All Checkbox */
+.checkbox-container .checkmark {
+  border-radius: 6px;
+  border: 2px solid rgba(148, 163, 184, 0.4);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.checkbox-container input:checked~.checkmark {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+}
+
+/* Export Selection Modal Styles */
+.export-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.export-list-container {
+  max-height: 400px;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  padding: 12px;
+}
+
+.tree-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tree-item {
+  margin-bottom: 4px;
+}
+
+.tree-item-content {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+
+.tree-item-content:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.tree-item-content .checkbox-container {
+  margin-right: 12px;
+  margin-bottom: 0;
+  padding-left: 28px;
+  /* Adjust for checkmark size */
+}
+
+.tree-item-icon {
+  margin-right: 10px;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+}
+
+.tree-item-label {
+  flex: 1;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.tree-children {
+  margin-left: 24px;
+  padding-left: 12px;
+  border-left: 1px solid var(--glass-border);
+  display: none;
+}
+
+.tree-item.expanded>.tree-children {
+  display: block;
+}
+
+.tree-toggle {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 4px;
+  color: var(--text-secondary);
+  transition: transform 0.2s;
+  cursor: pointer;
+}
+
+.tree-item.expanded>.tree-item-content .tree-toggle {
+  transform: rotate(90deg);
+}
+
+.tree-item.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Export Selection Tree Styles */
+.modal-lg {
+  width: 650px;
+  max-width: 95%;
+}
+
+.export-selection-container {
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  margin: 20px 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 450px;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.export-selection-header {
+  padding: 14px 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+}
+
+.export-tree-container {
+  padding: 12px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.export-tree-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.export-tree-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.export-tree-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.export-tree-item-wrapper {
+  margin-bottom: 2px;
+}
+
+.export-tree-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.export-tree-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.export-tree-item .checkbox-container {
+  padding-left: 24px;
+  margin-bottom: 0;
+  min-height: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+}
+
+.export-tree-item .checkbox-container .checkmark {
+  height: 18px;
+  width: 18px;
+}
+
+.export-tree-item .item-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.export-tree-item.folder .item-icon {
+  color: #FACC15;
+}
+
+.export-tree-item.connection .item-icon {
+  color: #94a3b8;
+}
+
+.export-tree-item .item-label {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.export-tree-children {
+  margin-left: 21px;
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+  padding-left: 12px;
+  list-style: none;
+}
+
+/* Password and Actions refinement */
+#export-password-form {
+  padding-top: 10px;
+}
+
+#export-password-form .form-group label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  display: block;
+}
+
+#export-password-form input {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 14px;
+}
+
+#export-password-form input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.export-search-bar {
+  margin-bottom: 16px;
+}
+
+.export-search-bar .search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.export-search-bar .search-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.export-search-bar input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 12px 16px 12px 40px;
+  color: var(--text-primary);
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.export-search-bar input:focus {
+  border-color: var(--accent);
+  background: rgba(0, 0, 0, 0.45);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.export-select-all-label {
+  padding-left: 28px !important;
+  height: 20px;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.export-select-all-label .label-text {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1;
+  display: inline-block;
+  margin-top: 1px;
+  /* Subtle adjustment for optical alignment */
+}
+
+.export-password-modal .modal-header-center h3 {
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.export-password-modal .modal-header-center p {
+  font-size: 13px;
+}
