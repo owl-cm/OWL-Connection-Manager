@@ -971,30 +971,41 @@ ipcMain.handle('sftp-download', async (event, { connection, remotePath }) => {
 });
 
 ipcMain.handle('sftp-upload', async (event, { connection, remoteDir }) => {
-  const { dialog } = require('electron');
-  const { filePaths } = await dialog.showOpenDialog(mainWindow, {
-    title: 'Upload File',
-    properties: ['openFile']
-  });
-
-  if (!filePaths || filePaths.length === 0) return false;
-
-  const localPath = filePaths[0];
-  // Fix: Use forward slash for remote paths regardless of local OS
-  const filename = path.basename(localPath);
-  const remotePath = remoteDir.endsWith('/') ? remoteDir + filename : remoteDir + '/' + filename;
-
   try {
+    const { dialog } = require('electron');
+    const { filePaths } = await dialog.showOpenDialog(mainWindow, {
+      title: 'Upload File',
+      properties: ['openFile']
+    });
+
+    if (!filePaths || filePaths.length === 0) {
+      console.log('[SFTP Upload] User cancelled file selection');
+      return false;
+    }
+
+    const localPath = filePaths[0];
+    // Fix: Use forward slash for remote paths regardless of local OS
+    const filename = path.basename(localPath);
+    const remotePath = remoteDir.endsWith('/') ? remoteDir + filename : remoteDir + '/' + filename;
+
+    console.log(`[SFTP Upload] Uploading ${localPath} to ${remotePath}`);
+
     const sftp = await getSftpConnection(connection);
+
     return new Promise((resolve, reject) => {
       sftp.fastPut(localPath, remotePath, (err) => {
-        if (err) reject(err);
-        else resolve(true);
+        if (err) {
+          console.error('[SFTP Upload] Error:', err.message);
+          reject(new Error(`Upload failed: ${err.message}`));
+        } else {
+          console.log('[SFTP Upload] Success');
+          resolve(true);
+        }
       });
     });
   } catch (err) {
-    console.error('SFTP Upload Error:', err);
-    throw err;
+    console.error('[SFTP Upload] Exception:', err.message);
+    throw new Error(`Upload failed: ${err.message}`);
   }
 });
 
