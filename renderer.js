@@ -68,6 +68,7 @@ let editingId = null; // Use ID instead of index
 let actionMenuTargetId = null;
 let draggedId = null;
 let broadcastMode = false;
+let selectedBroadcastSessions = new Set();
 
 
 // DOM Elements
@@ -93,6 +94,8 @@ const importBtn = document.getElementById('import-btn');
 const broadcastModal = document.getElementById('broadcast-modal');
 const broadcastConfirmBtn = document.getElementById('broadcast-confirm-btn');
 const broadcastCancelBtn = document.getElementById('broadcast-cancel-btn');
+const broadcastSelectAll = document.getElementById('broadcast-select-all');
+const broadcastSessionList = document.getElementById('broadcast-session-list');
 const snippetDeleteModal = document.getElementById('snippet-delete-modal');
 const snippetDeleteConfirmBtn = document.getElementById('snippet-delete-confirm-btn');
 const snippetDeleteCancelBtn = document.getElementById('snippet-delete-cancel-btn');
@@ -546,16 +549,110 @@ connectionSearch.oninput = () => {
 };
 
 
-
 // Broadcast Logic
 broadcastBtn.onclick = () => {
     if (broadcastBtn.classList.contains('disabled')) return;
     if (!broadcastMode) {
+        // Reset and populate broadcast selection
+        selectedBroadcastSessions = new Set();
+        Object.keys(sessions).forEach(id => selectedBroadcastSessions.add(id));
+
+        if (broadcastSelectAll) {
+            broadcastSelectAll.checked = true;
+            broadcastSelectAll.indeterminate = false;
+        }
+
+        renderBroadcastSessionList();
         broadcastModal.classList.remove('hidden');
     } else {
-        toggleBroadcastMode();
+        broadcastMode = false;
+        broadcastBtn.classList.remove('active');
+        showNotification('Broadcast Deactivated', 'Keystrokes will only be sent to the active terminal.', 'info');
     }
 };
+
+function renderBroadcastSessionList() {
+    if (!broadcastSessionList) return;
+    broadcastSessionList.innerHTML = '';
+
+    const sessionValues = Object.values(sessions);
+
+    if (sessionValues.length === 0) {
+        broadcastSessionList.innerHTML = '<div class="no-sessions-msg">No active terminal sessions found.</div>';
+        return;
+    }
+
+    const ul = document.createElement('ul');
+    ul.className = 'export-tree-list';
+
+    sessionValues.forEach(session => {
+        const li = document.createElement('li');
+        li.className = 'export-tree-item-wrapper';
+
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'export-tree-item connection';
+
+        const isChecked = selectedBroadcastSessions.has(session.sessionId);
+
+        itemDiv.innerHTML = `
+            <label class="checkbox-container" onclick="event.stopPropagation()">
+                <input type="checkbox" class="broadcast-item-checkbox" data-id="${session.sessionId}" ${isChecked ? 'checked' : ''}>
+                <span class="checkmark"></span>
+            </label>
+            <span class="item-icon">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+            </span>
+            <span class="item-label">${sanitizeHTML(session.connection.label)} <small style="opacity: 0.6; margin-left: 8px;">${sanitizeHTML(session.connection.host || '')}</small></span>
+        `;
+
+        const checkbox = itemDiv.querySelector('input');
+
+        const toggleSession = () => {
+            if (checkbox.checked) {
+                selectedBroadcastSessions.add(session.sessionId);
+            } else {
+                selectedBroadcastSessions.delete(session.sessionId);
+            }
+            updateBroadcastSelectAllState();
+        };
+
+        itemDiv.onclick = () => {
+            checkbox.checked = !checkbox.checked;
+            toggleSession();
+        };
+
+        checkbox.onchange = (e) => {
+            e.stopPropagation();
+            toggleSession();
+        };
+
+        li.appendChild(itemDiv);
+        ul.appendChild(li);
+    });
+
+    broadcastSessionList.appendChild(ul);
+}
+
+function updateBroadcastSelectAllState() {
+    if (!broadcastSelectAll) return;
+    const allSessions = Object.keys(sessions);
+    const allSelected = allSessions.length > 0 && allSessions.every(id => selectedBroadcastSessions.has(id));
+    const someSelected = allSessions.some(id => selectedBroadcastSessions.has(id));
+
+    broadcastSelectAll.checked = allSelected;
+    broadcastSelectAll.indeterminate = !allSelected && someSelected;
+}
+
+if (broadcastSelectAll) {
+    broadcastSelectAll.onchange = () => {
+        if (broadcastSelectAll.checked) {
+            Object.keys(sessions).forEach(id => selectedBroadcastSessions.add(id));
+        } else {
+            selectedBroadcastSessions.clear();
+        }
+        renderBroadcastSessionList();
+    };
+}
 
 broadcastConfirmBtn.onclick = () => {
     toggleBroadcastMode();
@@ -569,6 +666,21 @@ broadcastCancelBtn.onclick = () => {
 function toggleBroadcastMode() {
     broadcastMode = !broadcastMode;
     broadcastBtn.classList.toggle('active', broadcastMode);
+
+    // Update tab highlighting
+    Object.values(sessions).forEach(session => {
+        if (broadcastMode && selectedBroadcastSessions.has(session.sessionId)) {
+            session.tabEl.classList.add('broadcast-active');
+        } else {
+            session.tabEl.classList.remove('broadcast-active');
+        }
+    });
+
+    if (broadcastMode) {
+        showNotification('Broadcast Activated', `Keystrokes will be sent to ${selectedBroadcastSessions.size} terminals.`, 'warning');
+    } else {
+        showNotification('Broadcast Deactivated', 'Keystrokes will only be sent to the active terminal.', 'info');
+    }
 }
 
 // Process Manager Listeners
@@ -1132,13 +1244,15 @@ class TerminalInstance {
 
         this.term.onData(data => {
             if (this.pid) {
-                if (broadcastMode) {
+                // Only broadcast if broadcast mode is on AND this terminal is part of the selected group
+                if (broadcastMode && selectedBroadcastSessions.has(this.sessionId)) {
                     Object.values(sessions).forEach(session => {
-                        if (session.pid) {
+                        if (session.pid && selectedBroadcastSessions.has(session.sessionId)) {
                             ipcRenderer.send('terminal-write', { pid: session.pid, data });
                         }
                     });
                 } else {
+                    // Normal behavior: only write to this terminal
                     ipcRenderer.send('terminal-write', { pid: this.pid, data });
                 }
             }
@@ -1671,6 +1785,7 @@ function closeSession(sessionId) {
 
     session.dispose();
     delete sessions[sessionId];
+    selectedBroadcastSessions.delete(sessionId);
 
     if (activeSessionId === sessionId) {
         const remainingIds = Object.keys(sessions);

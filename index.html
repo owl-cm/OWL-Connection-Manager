@@ -557,13 +557,31 @@
 
     <!-- Broadcast Confirmation Modal -->
     <div id="broadcast-modal" class="modal hidden">
-      <div class="modal-content">
-        <h3>Activate Broadcast Mode?</h3>
-        <p>This will send your keystrokes to <strong>ALL</strong> active terminals simultaneously. Use with extreme
-          caution.</p>
+      <div class="modal-content modal-lg">
+        <div class="modal-header-center">
+          <div class="lock-icon-large">
+            <i class="fas fa-broadcast-tower"></i>
+          </div>
+          <h3>Activate Broadcast Mode?</h3>
+          <p class="text-secondary">Select the active terminals you want to broadcast your keystrokes to.</p>
+        </div>
+
+        <div class="export-selection-container">
+          <div class="export-selection-header">
+            <label class="checkbox-container export-select-all-label">
+              <input type="checkbox" id="broadcast-select-all" checked>
+              <span class="checkmark"></span>
+              <span class="label-text">Select All Active Sessions</span>
+            </label>
+          </div>
+          <div id="broadcast-session-list" class="export-tree-container">
+            <!-- Session list will be injected here -->
+          </div>
+        </div>
+
         <div class="form-actions">
           <button type="button" id="broadcast-cancel-btn" class="btn-secondary">Cancel</button>
-          <button type="button" id="broadcast-confirm-btn" class="btn-danger">Activate</button>
+          <button type="button" id="broadcast-confirm-btn" class="btn-danger">Activate Broadcast</button>
         </div>
       </div>
     </div>
