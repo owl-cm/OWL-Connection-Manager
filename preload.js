@@ -51,7 +51,6 @@ contextBridge.exposeInMainWorld('terminalFactory', {
             },
             resize: (cols, rows) => term.resize(cols, rows),
             fit: () => fitAddon.fit(),
-            proposeDimensions: () => fitAddon.proposeDimensions(),
             focus: () => term.focus(),
             getSelection: () => term.getSelection(),
             hasSelection: () => term.hasSelection(),
@@ -69,8 +68,8 @@ contextBridge.exposeInMainWorld('terminalFactory', {
             dispose: () => term.dispose(),
 
             // Properties accessors
-            getCols: () => term.cols,
-            getRows: () => term.rows
+            get cols() { return term.cols; },
+            get rows() { return term.rows; }
         };
     }
 });
