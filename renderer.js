@@ -68,7 +68,6 @@ let editingId = null; // Use ID instead of index
 let actionMenuTargetId = null;
 let draggedId = null;
 let broadcastMode = false;
-let selectedBroadcastSessions = new Set();
 
 
 // DOM Elements
@@ -81,7 +80,6 @@ const saveConnectionBtn = document.getElementById('save-connection-btn');
 const cancelBtn = document.getElementById('cancel-btn');
 const tabBar = document.getElementById('tab-bar');
 const terminalsWrapper = document.getElementById('terminals-wrapper');
-
 const emptyState = document.getElementById('empty-state');
 const contextMenu = document.getElementById('context-menu');
 const actionMenu = document.getElementById('action-menu');
@@ -94,8 +92,6 @@ const importBtn = document.getElementById('import-btn');
 const broadcastModal = document.getElementById('broadcast-modal');
 const broadcastConfirmBtn = document.getElementById('broadcast-confirm-btn');
 const broadcastCancelBtn = document.getElementById('broadcast-cancel-btn');
-const broadcastSelectAll = document.getElementById('broadcast-select-all');
-const broadcastSessionList = document.getElementById('broadcast-session-list');
 const snippetDeleteModal = document.getElementById('snippet-delete-modal');
 const snippetDeleteConfirmBtn = document.getElementById('snippet-delete-confirm-btn');
 const snippetDeleteCancelBtn = document.getElementById('snippet-delete-cancel-btn');
@@ -549,110 +545,16 @@ connectionSearch.oninput = () => {
 };
 
 
+
 // Broadcast Logic
 broadcastBtn.onclick = () => {
     if (broadcastBtn.classList.contains('disabled')) return;
     if (!broadcastMode) {
-        // Reset and populate broadcast selection
-        selectedBroadcastSessions = new Set();
-        Object.keys(sessions).forEach(id => selectedBroadcastSessions.add(id));
-
-        if (broadcastSelectAll) {
-            broadcastSelectAll.checked = true;
-            broadcastSelectAll.indeterminate = false;
-        }
-
-        renderBroadcastSessionList();
         broadcastModal.classList.remove('hidden');
     } else {
-        broadcastMode = false;
-        broadcastBtn.classList.remove('active');
-        showNotification('Broadcast Deactivated', 'Keystrokes will only be sent to the active terminal.', 'info');
+        toggleBroadcastMode();
     }
 };
-
-function renderBroadcastSessionList() {
-    if (!broadcastSessionList) return;
-    broadcastSessionList.innerHTML = '';
-
-    const sessionValues = Object.values(sessions);
-
-    if (sessionValues.length === 0) {
-        broadcastSessionList.innerHTML = '<div class="no-sessions-msg">No active terminal sessions found.</div>';
-        return;
-    }
-
-    const ul = document.createElement('ul');
-    ul.className = 'export-tree-list';
-
-    sessionValues.forEach(session => {
-        const li = document.createElement('li');
-        li.className = 'export-tree-item-wrapper';
-
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'export-tree-item connection';
-
-        const isChecked = selectedBroadcastSessions.has(session.sessionId);
-
-        itemDiv.innerHTML = `
-            <label class="checkbox-container" onclick="event.stopPropagation()">
-                <input type="checkbox" class="broadcast-item-checkbox" data-id="${session.sessionId}" ${isChecked ? 'checked' : ''}>
-                <span class="checkmark"></span>
-            </label>
-            <span class="item-icon">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
-            </span>
-            <span class="item-label">${sanitizeHTML(session.connection.label)} <small style="opacity: 0.6; margin-left: 8px;">${sanitizeHTML(session.connection.host || '')}</small></span>
-        `;
-
-        const checkbox = itemDiv.querySelector('input');
-
-        const toggleSession = () => {
-            if (checkbox.checked) {
-                selectedBroadcastSessions.add(session.sessionId);
-            } else {
-                selectedBroadcastSessions.delete(session.sessionId);
-            }
-            updateBroadcastSelectAllState();
-        };
-
-        itemDiv.onclick = () => {
-            checkbox.checked = !checkbox.checked;
-            toggleSession();
-        };
-
-        checkbox.onchange = (e) => {
-            e.stopPropagation();
-            toggleSession();
-        };
-
-        li.appendChild(itemDiv);
-        ul.appendChild(li);
-    });
-
-    broadcastSessionList.appendChild(ul);
-}
-
-function updateBroadcastSelectAllState() {
-    if (!broadcastSelectAll) return;
-    const allSessions = Object.keys(sessions);
-    const allSelected = allSessions.length > 0 && allSessions.every(id => selectedBroadcastSessions.has(id));
-    const someSelected = allSessions.some(id => selectedBroadcastSessions.has(id));
-
-    broadcastSelectAll.checked = allSelected;
-    broadcastSelectAll.indeterminate = !allSelected && someSelected;
-}
-
-if (broadcastSelectAll) {
-    broadcastSelectAll.onchange = () => {
-        if (broadcastSelectAll.checked) {
-            Object.keys(sessions).forEach(id => selectedBroadcastSessions.add(id));
-        } else {
-            selectedBroadcastSessions.clear();
-        }
-        renderBroadcastSessionList();
-    };
-}
 
 broadcastConfirmBtn.onclick = () => {
     toggleBroadcastMode();
@@ -666,21 +568,6 @@ broadcastCancelBtn.onclick = () => {
 function toggleBroadcastMode() {
     broadcastMode = !broadcastMode;
     broadcastBtn.classList.toggle('active', broadcastMode);
-
-    // Update tab highlighting
-    Object.values(sessions).forEach(session => {
-        if (broadcastMode && selectedBroadcastSessions.has(session.sessionId)) {
-            session.tabEl.classList.add('broadcast-active');
-        } else {
-            session.tabEl.classList.remove('broadcast-active');
-        }
-    });
-
-    if (broadcastMode) {
-        showNotification('Broadcast Activated', `Keystrokes will be sent to ${selectedBroadcastSessions.size} terminals.`, 'warning');
-    } else {
-        showNotification('Broadcast Deactivated', 'Keystrokes will only be sent to the active terminal.', 'info');
-    }
 }
 
 // Process Manager Listeners
@@ -902,34 +789,12 @@ function updateDockButtonsState() {
     toggleProcessesBtn.classList.toggle('disabled', !hasActiveSession);
 }
 
-function migrateData(data, isRoot = true) {
-    if (isRoot) {
-        // Ensure "Local Terminal" exists and is at the top
-        let localTerminal = data.find(item => item.id === 'local-terminal');
-        if (!localTerminal) {
-            localTerminal = {
-                id: 'local-terminal',
-                label: 'Local Terminal',
-                type: 'connection',
-                protocol: 'local',
-                isDefault: true
-            };
-            data.unshift(localTerminal);
-        } else {
-            // Ensure it's at the top
-            data = data.filter(item => item.id !== 'local-terminal');
-            data.unshift(localTerminal);
-        }
-    } else {
-        // Ensure "Local Terminal" is NOT in subfolders
-        data = data.filter(item => item.id !== 'local-terminal');
-    }
-
+function migrateData(data) {
     // If it's a flat list without IDs, convert it
     return data.map(item => {
         if (!item.id) item.id = generateId();
         if (!item.type) item.type = 'connection';
-        if (item.children) item.children = migrateData(item.children, false); // Recurse as non-root
+        if (item.children) item.children = migrateData(item.children); // Recurse
         return item;
     });
 }
@@ -953,7 +818,7 @@ function renderTree(items, container, query = '', parentColor = null) {
     filteredItems.forEach(item => {
         const li = document.createElement('li');
         li.dataset.id = item.id;
-        li.draggable = item.id !== 'local-terminal';
+        li.draggable = true;
 
         // Drag Events
         li.addEventListener('dragstart', handleDragStart);
@@ -1038,8 +903,6 @@ function renderTree(items, container, query = '', parentColor = null) {
                 iconSvg = '<i class="fas fa-desktop" style="font-size: 14px;"></i>';
             } else if (proto === 'vnc') {
                 iconSvg = '<i class="fas fa-tv" style="font-size: 14px;"></i>';
-            } else if (proto === 'local') {
-                iconSvg = '<i class="fas fa-terminal" style="font-size: 14px;"></i>';
             } else {
                 // SSH Default
                 iconSvg = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>';
@@ -1102,10 +965,7 @@ function handleDragOver(e) {
 
     targetLi.classList.remove('drag-over', 'drag-over-top', 'drag-over-bottom');
 
-    // Radical: Prevent Local Terminal from being dropped inside folders
-    const isLocalTerminal = draggedId === 'local-terminal';
-
-    if (item.type === 'folder' && offset > 10 && offset < rect.height - 10 && !isLocalTerminal) {
+    if (item.type === 'folder' && offset > 10 && offset < rect.height - 10) {
         targetLi.classList.add('drag-over'); // Drop inside
     } else if (offset < rect.height / 2) {
         targetLi.classList.add('drag-over-top');
@@ -1136,18 +996,6 @@ async function handleDrop(e) {
     if (!draggedInfo || !targetInfo) return;
 
     const draggedItem = draggedInfo.item;
-    const targetItem = targetInfo.item;
-
-    // Radical: Prevent Local Terminal from being moved into folders
-    if (draggedId === 'local-terminal') {
-        const isDropInsideFolder = targetItem.type === 'folder' && this.classList.contains('drag-over');
-        const isTargetInsideFolder = targetInfo.parent !== null;
-
-        if (isDropInsideFolder || isTargetInsideFolder) {
-            renderTree(connections, connectionListEl);
-            return;
-        }
-    }
 
     // Remove from old parent
     if (draggedInfo.parent) {
@@ -1159,6 +1007,7 @@ async function handleDrop(e) {
     // Determine drop position
     const rect = this.getBoundingClientRect();
     const offset = e.clientY - rect.top;
+    const targetItem = targetInfo.item;
 
     if (targetItem.type === 'folder' && this.classList.contains('drag-over')) {
         // Drop inside folder
@@ -1182,231 +1031,172 @@ async function handleDrop(e) {
 }
 
 
-
-class TerminalInstance {
-    constructor(sessionId, connection) {
-        this.sessionId = sessionId;
-        this.connection = connection;
-        this.pid = null;
-        this.logging = false;
-        this.currentPath = '.';
-
-        // Create Tab
-        this.tabEl = document.createElement('div');
-        this.tabEl.className = 'tab';
-        if (connection.color) {
-            this.tabEl.style.setProperty('--tab-color', connection.color);
-        }
-        this.tabEl.innerHTML = `
-            <span class="tab-title">${sanitizeHTML(connection.label)}</span>
-            <span class="tab-close">✕</span>
-        `;
-
-        // Create Container
-        this.containerEl = document.createElement('div');
-        this.containerEl.className = 'terminal-instance';
-
-        // Initialize xterm
-        this.term = window.terminalFactory.create({
-            theme: { background: '#000000' },
-            fontFamily: 'monospace',
-            fontSize: 14,
-            allowProposedApi: true,
-            copyOnSelection: true
-        });
-
-        this.resizeObserver = new ResizeObserver(() => {
-            this.fit();
-        });
-
-        this.setupListeners();
-    }
-
-    setupListeners() {
-        this.tabEl.onclick = (e) => {
-            if (e.target.classList.contains('tab-close')) {
-                e.stopPropagation();
-                closeSession(this.sessionId);
-            } else {
-                activateSession(this.sessionId);
-            }
-        };
-
-        this.tabEl.oncontextmenu = (e) => {
-            e.preventDefault();
-            showTabContextMenu(e.clientX, e.clientY, this.sessionId);
-        };
-
-        this.containerEl.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-            showContextMenu(e.clientX, e.clientY, this.sessionId);
-        });
-
-        this.term.onData(data => {
-            if (this.pid) {
-                // Only broadcast if broadcast mode is on AND this terminal is part of the selected group
-                if (broadcastMode && selectedBroadcastSessions.has(this.sessionId)) {
-                    Object.values(sessions).forEach(session => {
-                        if (session.pid && selectedBroadcastSessions.has(session.sessionId)) {
-                            ipcRenderer.send('terminal-write', { pid: session.pid, data });
-                        }
-                    });
-                } else {
-                    // Normal behavior: only write to this terminal
-                    ipcRenderer.send('terminal-write', { pid: this.pid, data });
-                }
-            }
-        });
-
-        this.term.onResize(({ cols, rows }) => {
-            if (this.pid) {
-                ipcRenderer.send('terminal-resize', { pid: this.pid, cols, rows });
-            }
-        });
-
-        // Robust Copy on Selection
-        this.term.onSelectionChange(() => {
-            if (this.term.hasSelection()) {
-                const selection = this.term.getSelection();
-                if (selection && selection.length > 0) {
-                    navigator.clipboard.writeText(selection);
-                }
-            }
-        });
-
-        // Keyboard Shortcuts
-        this.term.attachCustomKeyEventHandler((e) => {
-            if (e.type === 'keydown') {
-                const isCtrl = e.ctrlKey;
-                const isShift = e.shiftKey;
-                const isAlt = e.altKey;
-
-                // Ctrl+Shift+C: Copy
-                if (isCtrl && isShift && e.code === 'KeyC') {
-                    const selection = this.term.getSelection();
-                    if (selection) {
-                        navigator.clipboard.writeText(selection);
-                    }
-                    e.preventDefault();
-                    e.stopPropagation();
-                    return false;
-                }
-
-                // Ctrl+Shift+V: Paste
-                if (isCtrl && isShift && e.code === 'KeyV') {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    navigator.clipboard.readText().then(text => {
-                        if (this.pid) {
-                            ipcRenderer.send('terminal-write', { pid: this.pid, data: text });
-                        }
-                    });
-                    return false;
-                }
-
-                // Ctrl+Alt+P: Paste Password
-                if (isCtrl && isAlt && e.code === 'KeyP') {
-                    if (this.connection.password && this.pid) {
-                        ipcRenderer.send('terminal-write', { pid: this.pid, data: this.connection.password });
-                    }
-                    return false;
-                }
-
-                // Ctrl+Alt+L: Copy Password
-                if (isCtrl && isAlt && e.code === 'KeyL') {
-                    if (this.connection.password) {
-                        navigator.clipboard.writeText(this.connection.password);
-                        setTimeout(() => {
-                            navigator.clipboard.writeText('');
-                        }, 30000);
-                    }
-                    return false;
-                }
-            }
-            return true;
-        });
-    }
-
-    attach(tabBar, terminalsWrapper) {
-        tabBar.appendChild(this.tabEl);
-        terminalsWrapper.appendChild(this.containerEl);
-        this.term.open(this.containerEl);
-        this.resizeObserver.observe(this.containerEl);
-    }
-
-    activate() {
-        this.tabEl.classList.add('active');
-        this.containerEl.classList.add('active');
-
-        // Radical: Force a layout reflow
-        void this.containerEl.offsetWidth;
-
-        // Use requestAnimationFrame to ensure layout is updated
-        requestAnimationFrame(() => {
-            this.fit(true); // Aggressive fit
-            this.term.focus();
-        });
-    }
-
-    deactivate() {
-        this.tabEl.classList.remove('active');
-        this.containerEl.classList.remove('active');
-    }
-
-    fit(aggressive = false) {
-        // Only fit if the container is actually in the DOM and has size
-        if (this.containerEl.offsetParent !== null && this.containerEl.offsetWidth > 0) {
-            const dims = this.term.proposeDimensions();
-
-            if (dims) {
-                this.term.resize(dims.cols, dims.rows);
-            } else {
-                // Radical: Manual calculation if xterm fails to propose dimensions
-                const manualCols = Math.floor(this.containerEl.offsetWidth / 9);
-                const manualRows = Math.floor(this.containerEl.offsetHeight / 18);
-                this.term.resize(manualCols, manualRows);
-            }
-
-            // Radical: If aggressive, retry if we suspect a default size on a large container
-            if (aggressive && this.cols === 80 && this.rows === 24 && this.containerEl.offsetWidth > 800) {
-                setTimeout(() => this.fit(false), 100);
-            }
-        }
-    }
-
-    get cols() { return this.term.getCols(); }
-    get rows() { return this.term.getRows(); }
-
-    dispose() {
-        this.resizeObserver.disconnect();
-        this.tabEl.remove();
-        this.containerEl.remove();
-        this.term.dispose();
-    }
-}
-
-
 // Session Management (Updated for Color)
 function createSession(connection) {
     // Handle Non-SSH Protocols
-    if (connection.protocol && connection.protocol !== 'ssh' && connection.protocol !== 'local') {
+    if (connection.protocol && connection.protocol !== 'ssh') {
         ipcRenderer.invoke('launch-protocol', connection);
         return;
     }
 
     const sessionId = Date.now().toString();
-    const session = new TerminalInstance(sessionId, connection);
-    sessions[sessionId] = session;
 
-    session.attach(tabBar, terminalsWrapper);
+    // Create Tab
+    const tab = document.createElement('div');
+    tab.className = 'tab';
 
-    // Radical: Ensure dashboard is visible BEFORE activation
-    emptyState.style.display = 'none';
-    metricsDashboard.classList.remove('hidden');
+    // Apply color
+    if (connection.color) {
+        tab.style.setProperty('--tab-color', connection.color);
+    }
+
+    tab.innerHTML = `
+    <span class="tab-title">${sanitizeHTML(connection.label)}</span>
+    <span class="tab-close">✕</span>
+  `;
+    tab.onclick = (e) => {
+        if (e.target.classList.contains('tab-close')) {
+            e.stopPropagation();
+            closeSession(sessionId);
+        } else {
+            activateSession(sessionId);
+        }
+    };
+    tab.oncontextmenu = (e) => {
+        e.preventDefault();
+        showTabContextMenu(e.clientX, e.clientY, sessionId);
+    };
+    tabBar.appendChild(tab);
+
+    // Create Terminal Container
+    const container = document.createElement('div');
+    container.className = 'terminal-instance';
+    terminalsWrapper.appendChild(container);
+
+    // Initialize Terminal via Factory
+    const term = window.terminalFactory.create({
+        theme: { background: '#000000' },
+        fontFamily: 'monospace',
+        fontSize: 14,
+        allowProposedApi: true,
+        copyOnSelection: true
+    });
+
+    term.open(container);
+    term.fit();
+
+    // Keyboard Shortcuts
+    term.attachCustomKeyEventHandler((e) => {
+        if (e.type === 'keydown') {
+            const isCtrl = e.ctrlKey;
+            const isShift = e.shiftKey;
+            const isAlt = e.altKey;
+
+            // Ctrl+Shift+C: Copy
+            if (isCtrl && isShift && e.code === 'KeyC') {
+                const selection = term.getSelection();
+                if (selection) {
+                    navigator.clipboard.writeText(selection);
+                }
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+
+            // Ctrl+Shift+V: Paste
+            if (isCtrl && isShift && e.code === 'KeyV') {
+                e.preventDefault();
+                e.stopPropagation();
+                navigator.clipboard.readText().then(text => {
+                    if (sessions[sessionId] && sessions[sessionId].pid) {
+                        ipcRenderer.send('terminal-write', { pid: sessions[sessionId].pid, data: text });
+                    }
+                });
+                return false;
+            }
+
+            // Ctrl+Alt+P: Paste Password
+            if (isCtrl && isAlt && e.code === 'KeyP') {
+                const session = sessions[sessionId];
+                if (session && session.connection.password && session.pid) {
+                    ipcRenderer.send('terminal-write', { pid: session.pid, data: session.connection.password });
+                }
+                return false;
+            }
+
+            // Ctrl+Alt+L: Copy Password
+            if (isCtrl && isAlt && e.code === 'KeyL') {
+                const session = sessions[sessionId];
+                if (session && session.connection.password) {
+                    navigator.clipboard.writeText(session.connection.password);
+                    // Security: Clear clipboard after 30 seconds
+                    setTimeout(() => {
+                        navigator.clipboard.writeText('');
+                    }, 30000);
+                }
+                return false;
+            }
+        }
+        return true;
+    });
+
+    // Robust Copy on Selection
+    term.onSelectionChange(() => {
+        if (term.hasSelection()) {
+            const selection = term.getSelection();
+            if (selection && selection.length > 0) {
+                navigator.clipboard.writeText(selection);
+            }
+        }
+    });
+
+    // Context Menu - Attach to container since we can't access term.element directly
+    container.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        showContextMenu(e.clientX, e.clientY, sessionId);
+    });
+
+    // Store Session
+    sessions[sessionId] = {
+        term,
+        // fitAddon is now internal to term proxy
+        pid: null,
+        tabEl: tab,
+        containerEl: container,
+        connection,
+        currentPath: '.'
+    };
 
     activateSession(sessionId);
 
-    // Register listener BEFORE sending creation request
+    ipcRenderer.send('terminal-create', {
+        connection,
+        cols: term.cols,
+        rows: term.rows
+    });
+
+    term.onData(data => {
+        const s = sessions[sessionId];
+        if (s && s.pid) {
+            if (broadcastMode) {
+                Object.values(sessions).forEach(session => {
+                    if (session.pid) {
+                        ipcRenderer.send('terminal-write', { pid: session.pid, data });
+                    }
+                });
+            } else {
+                ipcRenderer.send('terminal-write', { pid: s.pid, data });
+            }
+        }
+    });
+
+    term.onResize(({ cols, rows }) => {
+        const s = sessions[sessionId];
+        if (s && s.pid) {
+            ipcRenderer.send('terminal-resize', { pid: s.pid, cols, rows });
+        }
+    });
+
     ipcRenderer.once('terminal-created', (event, { pid }) => {
         if (sessions[sessionId]) {
             sessions[sessionId].pid = pid;
@@ -1423,97 +1213,27 @@ function createSession(connection) {
                 });
             }
 
-            // Robust multi-stage sizing synchronization
-            const syncSize = (attempts) => {
-                if (!sessions[sessionId] || attempts <= 0) return;
-
-                sessions[sessionId].fit(true);
-                const cols = sessions[sessionId].cols;
-                const rows = sessions[sessionId].rows;
-
-                if (cols > 0 && rows > 0) {
-                    ipcRenderer.send('terminal-resize', {
-                        pid: sessions[sessionId].pid,
-                        cols: cols,
-                        rows: rows
-                    });
+            // Ensure initial size is synced after PID is available
+            setTimeout(() => {
+                if (sessions[sessionId]) {
+                    sessions[sessionId].term.fit();
+                    sessions[sessionId].term.focus();
                 }
-                sessions[sessionId].term.focus();
-
-                if (attempts > 1) {
-                    setTimeout(() => syncSize(attempts - 1), 300);
-                }
-            };
-
-            setTimeout(() => syncSize(5), 100);
+            }, 100);
         }
     });
-
-    // Wait for layout to settle, fonts to load, and container to have STABLE size
-    let creationAttempts = 0;
-    let lastWidth = 0;
-    let lastHeight = 0;
-    let stableCount = 0;
-
-    const waitForSizeAndCreate = async () => {
-        creationAttempts++;
-
-        // Wait for fonts on first attempt
-        if (creationAttempts === 1) {
-            await document.fonts.ready;
-        }
-
-        const width = session.containerEl.offsetWidth;
-        const height = session.containerEl.offsetHeight;
-
-        // Force reflow
-        void session.containerEl.offsetWidth;
-
-        if (width > 50 && height > 50) {
-            if (width === lastWidth && height === lastHeight) {
-                stableCount++;
-            } else {
-                stableCount = 0;
-                lastWidth = width;
-                lastHeight = height;
-            }
-
-            // Wait for 3 consecutive identical measurements to ensure stability
-            if (stableCount >= 3) {
-                session.fit(true);
-                ipcRenderer.send('terminal-create', {
-                    connection: connection.id === 'local-terminal' ? null : connection,
-                    cols: session.cols || 80,
-                    rows: session.rows || 24
-                });
-                return;
-            }
-        }
-
-        if (creationAttempts < 40) { // Wait up to 2 seconds
-            setTimeout(waitForSizeAndCreate, 50);
-        } else {
-            // Fallback: create with whatever we have
-            session.fit(true);
-            ipcRenderer.send('terminal-create', {
-                connection: connection.id === 'local-terminal' ? null : connection,
-                cols: session.cols || 80,
-                rows: session.rows || 24
-            });
-        }
-    };
-    waitForSizeAndCreate();
 }
 
 function activateSession(sessionId) {
     activeSessionId = sessionId;
-
-    // Deactivate all sessions
-    Object.values(sessions).forEach(s => s.deactivate());
-
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    if (sessions[sessionId]) {
+        sessions[sessionId].tabEl.classList.add('active');
+    }
+    document.querySelectorAll('.terminal-instance').forEach(c => c.classList.remove('active'));
     if (sessions[sessionId]) {
         const session = sessions[sessionId];
-        session.activate();
+        session.containerEl.classList.add('active');
 
         // Reset UI immediately for the new session
         resetMetricsUI();
@@ -1522,6 +1242,12 @@ function activateSession(sessionId) {
 
         explorerPathInput.value = session.currentPath;
         explorerDirSize.innerText = '...';
+
+        // Fit the terminal after a short delay to ensure container is visible
+        setTimeout(() => {
+            session.term.fit();
+            session.term.focus();
+        }, 50);
 
         emptyState.style.display = 'none';
         metricsDashboard.classList.remove('hidden');
@@ -1783,10 +1509,10 @@ function closeSession(sessionId) {
         });
     }
 
-    session.dispose();
+    session.tabEl.remove();
+    session.containerEl.remove();
+    session.term.dispose();
     delete sessions[sessionId];
-    selectedBroadcastSessions.delete(sessionId);
-
     if (activeSessionId === sessionId) {
         const remainingIds = Object.keys(sessions);
         if (remainingIds.length > 0) {
@@ -1892,48 +1618,30 @@ function showActionMenu(e, id) {
 
     actionMenuTargetId = id;
 
-    const isLocalTerminal = actionMenuTargetId === 'local-terminal';
-    const editBtn = document.getElementById('action-edit');
-    const cloneBtn = document.getElementById('action-clone');
-    const deleteBtn = document.getElementById('action-delete');
+    document.getElementById('action-edit').onclick = () => {
+        openModal(actionMenuTargetId);
+        actionMenu.classList.add('hidden');
+    };
 
-    if (isLocalTerminal) {
-        editBtn.classList.add('disabled');
-        cloneBtn.classList.add('disabled');
-        deleteBtn.classList.add('disabled');
-        editBtn.onclick = null;
-        cloneBtn.onclick = null;
-        deleteBtn.onclick = null;
-    } else {
-        editBtn.classList.remove('disabled');
-        cloneBtn.classList.remove('disabled');
-        deleteBtn.classList.remove('disabled');
+    document.getElementById('action-clone').onclick = () => {
+        cloneItem(actionMenuTargetId);
+        actionMenu.classList.add('hidden');
+    };
 
-        editBtn.onclick = () => {
-            openModal(actionMenuTargetId);
-            actionMenu.classList.add('hidden');
-        };
+    document.getElementById('action-delete').onclick = () => {
+        const item = findItem(connections, actionMenuTargetId);
+        const isFolder = item && item.type === 'folder';
+        const titleEl = document.getElementById('delete-modal-title');
+        const messageEl = document.getElementById('delete-modal-message');
 
-        cloneBtn.onclick = () => {
-            cloneItem(actionMenuTargetId);
-            actionMenu.classList.add('hidden');
-        };
+        if (titleEl) titleEl.innerText = isFolder ? 'Delete Folder?' : 'Delete Connection?';
+        if (messageEl) messageEl.innerText = isFolder
+            ? 'Are you sure you want to delete this folder and all its contents? This action cannot be undone.'
+            : 'Are you sure you want to delete this connection? This action cannot be undone.';
 
-        deleteBtn.onclick = () => {
-            const item = findItem(connections, actionMenuTargetId);
-            const isFolder = item && item.type === 'folder';
-            const titleEl = document.getElementById('delete-modal-title');
-            const messageEl = document.getElementById('delete-modal-message');
-
-            if (titleEl) titleEl.innerText = isFolder ? 'Delete Folder?' : 'Delete Connection?';
-            if (messageEl) messageEl.innerText = isFolder
-                ? 'Are you sure you want to delete this folder and all its contents? This action cannot be undone.'
-                : 'Are you sure you want to delete this connection? This action cannot be undone.';
-
-            deleteModal.classList.remove('hidden');
-            actionMenu.classList.add('hidden');
-        };
-    }
+        deleteModal.classList.remove('hidden');
+        actionMenu.classList.add('hidden');
+    };
 }
 
 // Tab Context Menu Logic
