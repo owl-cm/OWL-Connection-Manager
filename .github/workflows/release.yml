@@ -2,8 +2,8 @@ name: Build and Release
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - develop
 
 jobs:
   build:
@@ -15,7 +15,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '16' # Matching the older electron version requirements if any, but 16 is safe for most
+          node-version: '16'
           cache: 'npm'
 
       - name: Install system dependencies
@@ -29,10 +29,15 @@ jobs:
       - name: Build .deb package
         run: npm run build:deb
 
+      - name: Get version from package.json
+        id: package-version
+        run: echo "version=v$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.package-version.outputs.version }}
           files: dist/installers/*.deb
           draft: false
           prerelease: false
