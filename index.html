@@ -832,20 +832,40 @@
   </div>
 
   <!-- Export Password Modal -->
-  <div id="export-password-modal" class="modal hidden" style="z-index: 2000;">
-    <div class="modal-content">
+  <div id="export-password-modal" class="modal export-password-modal hidden" style="z-index: 2000;">
+    <div class="modal-content modal-lg">
       <div class="modal-header-center">
         <div class="lock-icon-large">
           <i class="fas fa-file-export"></i>
         </div>
         <h3>Secure Export</h3>
-        <p class="text-secondary">Set a password to encrypt this backup file.</p>
+        <p class="text-secondary">Select items to export and set a password.</p>
       </div>
+
+      <div class="export-search-bar">
+        <div class="search-input-wrapper">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" id="export-search-input" placeholder="Search by name or IP...">
+        </div>
+      </div>
+
+      <div class="export-selection-container">
+        <div class="export-selection-header">
+          <label class="checkbox-container export-select-all-label">
+            <input type="checkbox" id="export-select-all" checked>
+            <span class="checkmark"></span>
+            <span class="label-text">Select All</span>
+          </label>
+        </div>
+        <div id="export-tree-container" class="export-tree-container">
+          <!-- Export tree will be injected here -->
+        </div>
+      </div>
+
       <form id="export-password-form">
         <div class="form-group">
           <label>Backup Password</label>
-          <input type="password" id="export-password-input" required placeholder="Create a password" minlength="4"
-            autofocus>
+          <input type="password" id="export-password-input" required placeholder="Create a password" minlength="4">
         </div>
         <div class="form-actions">
           <button type="submit" class="btn-primary full-width">Encrypt & Export</button>

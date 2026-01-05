@@ -121,11 +121,15 @@ const importDecryptPassword = document.getElementById('import-decrypt-password')
 const importDecryptCancel = document.getElementById('import-decrypt-cancel');
 let pendingImportFile = null;
 
-// Export Password Elements
+// Export Elements
 const exportPasswordModal = document.getElementById('export-password-modal');
 const exportPasswordForm = document.getElementById('export-password-form');
 const exportPasswordInput = document.getElementById('export-password-input');
 const exportPasswordCancel = document.getElementById('export-password-cancel');
+const exportSelectAll = document.getElementById('export-select-all');
+const exportTreeContainer = document.getElementById('export-tree-container');
+const exportSearchInput = document.getElementById('export-search-input');
+let selectedExportIds = new Set();
 
 // Logs Elements
 const toggleLogsBtn = document.getElementById('toggle-logs-btn');
@@ -465,8 +469,34 @@ ipcRenderer.on('terminal-created', (event, { pid }) => {
 exportBtn.onclick = () => {
     exportPasswordModal.classList.remove('hidden');
     exportPasswordInput.value = '';
+
+    // Reset selection
+    selectedExportIds = new Set();
+    // Select all by default (except local terminal)
+    const getAllIds = (items) => {
+        items.forEach(item => {
+            if (item.id !== 'local-terminal') {
+                selectedExportIds.add(item.id);
+                if (item.children) getAllIds(item.children);
+            }
+        });
+    };
+    getAllIds(connections);
+
+    exportSelectAll.checked = true;
+    exportSelectAll.indeterminate = false;
+
+    if (exportSearchInput) exportSearchInput.value = '';
+    renderExportTree(connections, exportTreeContainer);
     exportPasswordInput.focus();
 };
+
+if (exportSearchInput) {
+    exportSearchInput.oninput = () => {
+        const query = exportSearchInput.value.toLowerCase();
+        renderExportTree(connections, exportTreeContainer, query);
+    };
+}
 
 if (exportPasswordForm) {
     exportPasswordForm.addEventListener('submit', async (e) => {
@@ -477,7 +507,27 @@ if (exportPasswordForm) {
             return;
         }
 
-        const success = await ipcRenderer.invoke('export-connections', connections, password);
+        if (selectedExportIds.size === 0) {
+            showNotification('Error', 'Please select at least one item to export', 'error');
+            return;
+        }
+
+        // Filter connections based on selection
+        const filterConnections = (items) => {
+            return items
+                .filter(item => selectedExportIds.has(item.id))
+                .map(item => {
+                    const newItem = { ...item };
+                    if (newItem.children) {
+                        newItem.children = filterConnections(newItem.children);
+                    }
+                    return newItem;
+                });
+        };
+
+        const filteredConnections = filterConnections(connections);
+
+        const success = await ipcRenderer.invoke('export-connections', filteredConnections, password);
         if (success) {
             exportPasswordModal.classList.add('hidden');
             exportPasswordInput.value = '';
@@ -883,17 +933,190 @@ explorerRefreshBtn.onclick = () => {
 
 explorerUploadBtn.onclick = async () => {
     const session = sessions[activeSessionId];
-    if (!session) return;
-    const success = await ipcRenderer.invoke('sftp-upload', {
-        connection: session.connection,
-        remoteDir: session.currentPath
-    });
-    if (success) loadRemoteFiles(session.currentPath);
+    if (!session) {
+        showNotification('Upload Failed', 'No active session', 'error');
+        return;
+    }
+
+    try {
+        const success = await ipcRenderer.invoke('sftp-upload', {
+            connection: session.connection,
+            remoteDir: session.currentPath
+        });
+
+        if (success) {
+            showNotification('Upload Successful', 'File uploaded successfully', 'success');
+            loadRemoteFiles(session.currentPath);
+        } else {
+            showNotification('Upload Cancelled', 'File upload was cancelled', 'error');
+        }
+    } catch (error) {
+        console.error('Upload error:', error);
+        showNotification('Upload Failed', error.message || 'Failed to upload file', 'error');
+    }
 };
 
 // Initial dock button state
 updateDockButtonsState();
 
+
+// Render Export Tree
+function renderExportTree(items, container, query = '') {
+    container.innerHTML = '';
+    const ul = document.createElement('ul');
+    ul.className = 'export-tree-list';
+
+    // Filter out local terminal from export selection
+    let exportableItems = items.filter(item => item.id !== 'local-terminal');
+
+    // Apply search filter if query exists
+    if (query) {
+        exportableItems = exportableItems.filter(item => {
+            const matchesLabel = item.label.toLowerCase().includes(query);
+            const matchesHost = item.host && item.host.toLowerCase().includes(query);
+
+            if (matchesLabel || matchesHost) return true;
+
+            if (item.type === 'folder' && item.children) {
+                // Show folder if any of its children match
+                return item.children.some(child => {
+                    const childMatchesLabel = child.label.toLowerCase().includes(query);
+                    const childMatchesHost = child.host && child.host.toLowerCase().includes(query);
+                    return childMatchesLabel || childMatchesHost;
+                });
+            }
+            return false;
+        });
+    }
+
+    exportableItems.forEach(item => {
+        const li = document.createElement('li');
+        li.className = 'export-tree-item-wrapper';
+
+        const itemDiv = document.createElement('div');
+        itemDiv.className = `export-tree-item ${item.type}`;
+
+        const isChecked = selectedExportIds.has(item.id);
+
+        itemDiv.innerHTML = `
+            <label class="checkbox-container" onclick="event.stopPropagation()">
+                <input type="checkbox" class="export-item-checkbox" data-id="${item.id}" ${isChecked ? 'checked' : ''}>
+                <span class="checkmark"></span>
+            </label>
+            <span class="item-icon">
+                ${item.type === 'folder' ?
+                '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>' :
+                '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>'}
+            </span>
+            <span class="item-label">${sanitizeHTML(item.label)}</span>
+        `;
+
+        const checkbox = itemDiv.querySelector('input');
+
+        // Toggle on item click
+        itemDiv.onclick = (e) => {
+            checkbox.checked = !checkbox.checked;
+            toggleExportItem(item, checkbox.checked);
+            updateExportSelectAllState();
+            renderExportTree(connections, exportTreeContainer);
+        };
+
+        checkbox.onchange = (e) => {
+            e.stopPropagation();
+            toggleExportItem(item, checkbox.checked);
+            updateExportSelectAllState();
+            renderExportTree(connections, exportTreeContainer);
+        };
+
+        li.appendChild(itemDiv);
+
+        if (item.children && item.children.length > 0) {
+            const childrenUl = document.createElement('ul');
+            childrenUl.className = 'export-tree-children';
+            renderExportTree(item.children, childrenUl, query);
+            li.appendChild(childrenUl);
+        }
+
+        ul.appendChild(li);
+    });
+
+    container.appendChild(ul);
+}
+
+function toggleExportItem(item, isChecked) {
+    if (isChecked) {
+        selectedExportIds.add(item.id);
+    } else {
+        selectedExportIds.delete(item.id);
+    }
+
+    if (item.children) {
+        item.children.forEach(child => toggleExportItem(child, isChecked));
+    }
+
+    // Update parent state
+    updateParentSelectionState(connections, item.id);
+}
+
+function updateParentSelectionState(items, childId) {
+    for (const item of items) {
+        if (item.children) {
+            const hasChild = item.children.some(c => c.id === childId || (c.children && findChildRecursive(c.children, childId)));
+            if (hasChild) {
+                // Check if all children are selected
+                const allSelected = item.children.every(c => selectedExportIds.has(c.id));
+                const someSelected = item.children.some(c => selectedExportIds.has(c.id));
+
+                if (allSelected) {
+                    selectedExportIds.add(item.id);
+                } else {
+                    selectedExportIds.delete(item.id);
+                }
+                updateParentSelectionState(connections, item.id);
+                return;
+            }
+            updateParentSelectionState(item.children, childId);
+        }
+    }
+}
+
+function findChildRecursive(children, id) {
+    return children.some(c => c.id === id || (c.children && findChildRecursive(c.children, id)));
+}
+
+function updateExportSelectAllState() {
+    const exportableItems = [];
+    const collectExportable = (items) => {
+        items.forEach(item => {
+            if (item.id !== 'local-terminal') {
+                exportableItems.push(item);
+                if (item.children) collectExportable(item.children);
+            }
+        });
+    };
+    collectExportable(connections);
+
+    const allSelected = exportableItems.every(item => selectedExportIds.has(item.id));
+    const someSelected = exportableItems.some(item => selectedExportIds.has(item.id));
+
+    exportSelectAll.checked = allSelected;
+    exportSelectAll.indeterminate = !allSelected && someSelected;
+}
+
+exportSelectAll.addEventListener('change', () => {
+    const isChecked = exportSelectAll.checked;
+    const updateAll = (items) => {
+        items.forEach(item => {
+            if (item.id !== 'local-terminal') {
+                if (isChecked) selectedExportIds.add(item.id);
+                else selectedExportIds.delete(item.id);
+                if (item.children) updateAll(item.children);
+            }
+        });
+    };
+    updateAll(connections);
+    renderExportTree(connections, exportTreeContainer);
+});
 
 function updateDockButtonsState() {
     const hasActiveSession = !!activeSessionId;
