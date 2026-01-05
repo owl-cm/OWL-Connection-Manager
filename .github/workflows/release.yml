@@ -46,6 +46,10 @@ jobs:
             echo "should_release=true" >> $GITHUB_OUTPUT
           fi
 
+      - name: Update package.json version
+        if: steps.pr-tag.outputs.should_release == 'true'
+        run: npm version ${{ steps.pr-tag.outputs.version }} --no-git-tag-version
+
       - name: Build .deb package
         if: steps.pr-tag.outputs.should_release == 'true'
         run: npm run build:deb
