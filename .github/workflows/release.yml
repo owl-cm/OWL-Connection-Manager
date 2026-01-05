@@ -1,7 +1,8 @@
 name: Build and Release
 
 on:
-  push:
+  pull_request:
+    types: [closed]
     branches:
       - develop
 
@@ -12,6 +13,7 @@ permissions:
 
 jobs:
   build:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -34,15 +36,21 @@ jobs:
       - name: Build .deb package
         run: npm run build:deb
 
-      - name: Get version from package.json
-        id: package-version
-        run: echo "version=v$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+      - name: Get tag from PR labels
+        id: pr-tag
+        run: |
+          TAG=$(echo '${{ toJson(github.event.pull_request.labels.*.name) }}' | jq -r '.[] | select(startswith("v"))' | head -n 1)
+          if [ -z "$TAG" ]; then
+            echo "No version label (starting with 'v') found on PR. Skipping release."
+            exit 1
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
 
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.package-version.outputs.version }}
+          tag_name: ${{ steps.pr-tag.outputs.tag }}
           files: dist/installers/*.deb
           draft: false
           prerelease: false
