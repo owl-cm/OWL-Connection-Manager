@@ -26,7 +26,7 @@ const options = {
     name: 'owl',
     productName: 'OWL Connection Manager',
     genericName: 'Connection Manager',
-    version: '1.0.0',
+    version: process.env.APP_VERSION || '1.0.0',
     description: 'A simple connection manager',
     categories: ['Network'],
     maintainer: 'Mazghari <mohamed.azghari99@gmail.com>', // Placeholder, required field
