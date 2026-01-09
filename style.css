@@ -532,6 +532,7 @@ body {
   gap: 8px;
   border: 1px solid transparent;
   border-bottom: none;
+  border-top: 2px solid var(--tab-color, transparent);
   margin-right: 2px;
   transition: all 0.2s;
   max-width: 200px;
@@ -551,7 +552,6 @@ body {
   /* Blend with terminal */
 
   /* Dynamic coloring */
-  border-top: 2px solid var(--tab-color, transparent);
   background: linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.8));
 }
 
@@ -582,6 +582,61 @@ body {
 .tab-close:hover {
   background-color: rgba(255, 255, 255, 0.2);
   opacity: 1;
+}
+
+.tab.broadcast-active {
+  background: rgba(244, 63, 94, 0.2);
+  opacity: 0.8;
+}
+
+.tab.broadcast-active .tab-title {
+  color: #fca5a5;
+  /* Light red text */
+  text-shadow: none;
+}
+
+.tab.broadcast-active.active {
+  background: var(--danger);
+  opacity: 1;
+  box-shadow: 0 0 20px rgba(244, 63, 94, 0.4);
+}
+
+.tab.broadcast-active.active .tab-title {
+  color: white;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes broadcast-pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.3);
+  }
+}
+
+.broadcast-icon {
+  display: none;
+  color: #ef4444;
+  /* Red */
+  margin-right: 8px;
+  font-size: 12px;
+  filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.5));
+}
+
+.tab.broadcast-active .broadcast-icon {
+  display: inline-block;
+  animation: broadcast-pulse 1.5s infinite ease-in-out;
+}
+
+.tab.broadcast-active.active .broadcast-icon {
+  color: #ef4444;
+  /* Keep it red */
+  filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.8));
 }
 
 #terminals-wrapper {

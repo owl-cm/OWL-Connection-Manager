@@ -1285,7 +1285,9 @@ function renderTree(items, container, query = '', parentColor = null) {
       `;
 
             li.onclick = (e) => {
-                createSession(item);
+                const sessionItem = { ...item };
+                if (connectionColor) sessionItem.color = connectionColor;
+                createSession(sessionItem);
             };
 
 
@@ -1421,6 +1423,7 @@ class TerminalInstance {
             this.tabEl.style.setProperty('--tab-color', connection.color);
         }
         this.tabEl.innerHTML = `
+            <span class="broadcast-icon"><i class="fas fa-tower-broadcast"></i></span>
             <span class="tab-title">${sanitizeHTML(connection.label)}</span>
             <span class="tab-close">✕</span>
         `;
