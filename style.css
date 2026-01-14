@@ -47,6 +47,10 @@ body {
   overflow: hidden;
 }
 
+.hidden {
+  display: none !important;
+}
+
 .container {
   display: flex;
   height: 100%;
@@ -512,52 +516,77 @@ body {
 
 .tab-bar {
   display: flex;
-  background-color: var(--bg-sidebar);
+  background-color: #020617;
   border-bottom: 1px solid var(--glass-border);
-  height: 40px;
+  height: 44px;
   align-items: flex-end;
-  padding: 0 10px;
+  padding: 0 12px;
   overflow-x: auto;
+  gap: 4px;
+  backdrop-filter: blur(10px);
 }
 
 .tab {
-  padding: 8px 16px;
-  background-color: transparent;
+  padding: 10px 16px;
+  background-color: rgba(255, 255, 255, 0.02);
   color: var(--text-secondary);
-  border-radius: 8px 8px 0 0;
+  border-radius: 10px 10px 0 0;
   cursor: pointer;
   font-size: 13px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   border: 1px solid transparent;
   border-bottom: none;
-  border-top: 2px solid var(--tab-color, transparent);
-  margin-right: 2px;
-  transition: all 0.2s;
-  max-width: 200px;
-  min-width: 120px;
+  margin-right: 0;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  max-width: 220px;
+  min-width: 140px;
+  position: relative;
+  opacity: 0.7;
+}
+
+.tab::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--tab-color, transparent);
+  border-radius: 10px 10px 0 0;
+  opacity: 0.3;
+  transition: opacity 0.2s;
 }
 
 .tab:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.06);
+  opacity: 0.9;
+}
+
+.tab:hover::before {
+  opacity: 0.6;
 }
 
 .tab.active {
-  background-color: rgba(0, 0, 0, 0.8);
-  /* Match terminal bg */
+  background-color: #0f172a;
   color: var(--text-primary);
   border-color: var(--glass-border);
-  border-bottom-color: #000;
-  /* Blend with terminal */
+  border-bottom-color: #0f172a;
+  opacity: 1;
+  z-index: 1;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.2);
+}
 
-  /* Dynamic coloring */
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.8));
+.tab.active::before {
+  opacity: 1;
+  height: 3px;
 }
 
 .tab.active .tab-title {
-  color: var(--tab-color, var(--text-primary));
-  text-shadow: 0 0 10px var(--tab-color, transparent);
+  color: var(--text-primary);
+  font-weight: 600;
+  text-shadow: 0 0 15px var(--tab-color, transparent);
 }
 
 .tab-title {
@@ -565,6 +594,7 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   flex: 1;
+  transition: all 0.25s ease;
 }
 
 .tab-close {
@@ -585,26 +615,28 @@ body {
 }
 
 .tab.broadcast-active {
-  background: rgba(244, 63, 94, 0.2);
-  opacity: 0.8;
+  background-color: rgba(244, 63, 94, 0.15);
+  opacity: 0.9;
+  border-color: rgba(244, 63, 94, 0.2);
 }
 
 .tab.broadcast-active .tab-title {
   color: #fca5a5;
-  /* Light red text */
-  text-shadow: none;
+  text-shadow: 0 0 8px rgba(244, 63, 94, 0.3);
 }
 
 .tab.broadcast-active.active {
-  background: var(--danger);
+  background-color: #4c0519;
   opacity: 1;
-  box-shadow: 0 0 20px rgba(244, 63, 94, 0.4);
+  box-shadow: 0 0 25px rgba(244, 63, 94, 0.3);
+  border-color: rgba(244, 63, 94, 0.4);
+  border-bottom-color: #4c0519;
 }
 
 .tab.broadcast-active.active .tab-title {
   color: white;
   font-weight: 700;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 0 10px rgba(244, 63, 94, 0.5);
 }
 
 @keyframes broadcast-pulse {
@@ -2572,11 +2604,67 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 10px;
-  margin-bottom: 12px;
-  border-bottom: 1px solid var(--glass-border);
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 8px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+
+.logs-sidebar-header:hover {
+  background: rgba(30, 41, 59, 0.7);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.logs-sidebar-header .checkbox-container {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding-left: 0 !important;
+  margin: 0 !important;
+  min-height: auto !important;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.logs-sidebar-header .checkbox-container .checkmark {
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  transform: none !important;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.logs-sidebar-header .checkbox-container:hover .checkmark {
+  border-color: var(--accent);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.logs-sidebar-header .checkbox-container input:checked~.checkmark {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
+}
+
+.logs-sidebar-header .checkbox-container .checkmark:after {
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2.5px 2.5px 0;
+  transform: rotate(45deg);
 }
 
 #delete-selected-logs-btn {
@@ -2625,8 +2713,8 @@ body {
 .log-item {
   display: flex;
   align-items: flex-start;
-  gap: 14px;
-  padding: 16px;
+  gap: 16px;
+  padding: 16px 18px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 12px;
@@ -2643,8 +2731,8 @@ body {
 
 .log-item.active {
   background: rgba(99, 102, 241, 0.1);
-  border-color: #6366f1;
-  box-shadow: 0 0 0 1px #6366f1;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
 }
 
 .log-item-content {
@@ -2704,21 +2792,21 @@ body {
   transform: translateY(-50%);
   height: 18px;
   width: 18px;
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--glass-border);
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
   border-radius: 5px;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.checkbox-container:hover input~.checkmark {
-  background-color: rgba(255, 255, 255, 0.1);
+.checkbox-container:hover .checkmark {
+  background-color: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.3);
 }
 
 .checkbox-container input:checked~.checkmark {
   background-color: var(--accent);
   border-color: var(--accent);
-  box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.3);
 }
 
 .checkmark:after {
@@ -2808,6 +2896,9 @@ body {
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
 }
 
 .log-item:hover {
@@ -2834,6 +2925,38 @@ body {
   color: var(--text-secondary);
   display: flex;
   justify-content: space-between;
+}
+
+.log-item .checkbox-container {
+  display: flex !important;
+  align-items: center !important;
+  padding-left: 0 !important;
+  margin: 0 !important;
+  min-height: auto !important;
+  flex-shrink: 0;
+  height: 20px;
+  /* Match the line-height of the filename */
+}
+
+.log-item .checkbox-container .checkmark {
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  transform: none !important;
+  width: 18px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+}
+
+.log-item .checkbox-container:hover .checkmark {
+  border-color: var(--accent);
+}
+
+.log-item .checkbox-container input:checked~.checkmark {
+  background: var(--accent);
+  border-color: var(--accent);
 }
 
 .log-actions {
@@ -3644,7 +3767,7 @@ body {
 /* --- Snippet Palette Items --- */
 .palette-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   padding: 10px 12px;
   border-radius: 6px;
@@ -3652,6 +3775,7 @@ body {
   transition: all 0.15s ease;
   border: 1px solid transparent;
   margin-bottom: 2px;
+  gap: 12px;
 }
 
 .palette-item:hover,
@@ -3683,6 +3807,39 @@ body {
   max-width: 400px;
 }
 
+.palette-item .checkbox-container {
+  display: flex !important;
+  align-items: center !important;
+  padding-left: 0 !important;
+  margin: 0 !important;
+  min-height: auto !important;
+  flex-shrink: 0;
+  width: 18px;
+  height: 20px;
+  /* Match the line-height of the snippet name (14px font) */
+}
+
+.palette-item .checkbox-container .checkmark {
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  transform: none !important;
+  width: 18px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+}
+
+.palette-item .checkbox-container:hover .checkmark {
+  border-color: var(--accent);
+}
+
+.palette-item .checkbox-container input:checked~.checkmark {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
 .palette-item-actions {
   display: flex;
   gap: 8px;
@@ -3711,7 +3868,24 @@ body {
   flex-direction: column;
 }
 
-/* Custom Select */
+#palette-select-all-label {
+  display: flex !important;
+  align-items: center !important;
+  padding-left: 0 !important;
+  margin: 0 !important;
+  min-height: auto !important;
+  flex-shrink: 0;
+}
+
+#palette-select-all-label .checkmark {
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  transform: none !important;
+  width: 18px;
+  height: 18px;
+}
+
 .form-group select {
   width: 100%;
   padding: 12px 16px;
@@ -4224,10 +4398,27 @@ body {
 }
 
 .tree-item-content .checkbox-container {
+  display: flex !important;
+  align-items: center !important;
+  padding-left: 0 !important;
+  margin: 0 !important;
+  min-height: auto !important;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
   margin-right: 12px;
-  margin-bottom: 0;
-  padding-left: 28px;
-  /* Adjust for checkmark size */
+}
+
+.tree-item-content .checkbox-container .checkmark {
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  transform: none !important;
+  width: 18px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
 }
 
 .tree-item-icon {
@@ -4341,17 +4532,26 @@ body {
 }
 
 .export-tree-item .checkbox-container {
-  padding-left: 24px;
-  margin-bottom: 0;
-  min-height: 18px;
+  display: flex !important;
+  align-items: center !important;
+  padding-left: 0 !important;
+  margin: 0 !important;
+  min-height: auto !important;
+  flex-shrink: 0;
+  width: 18px;
   height: 18px;
-  display: flex;
-  align-items: center;
 }
 
 .export-tree-item .checkbox-container .checkmark {
-  height: 18px;
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  transform: none !important;
   width: 18px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
 }
 
 .export-tree-item .item-icon {
@@ -4452,10 +4652,26 @@ body {
 }
 
 .export-select-all-label {
-  padding-left: 28px !important;
-  height: 20px;
   display: flex !important;
   align-items: center !important;
+  gap: 12px !important;
+  padding-left: 0 !important;
+  margin: 0 !important;
+  min-height: auto !important;
+  cursor: pointer;
+}
+
+.export-select-all-label .checkmark {
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  transform: none !important;
+  width: 18px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  flex-shrink: 0;
 }
 
 .export-select-all-label .label-text {
@@ -4463,9 +4679,6 @@ body {
   font-size: 13px;
   color: var(--text-primary);
   line-height: 1;
-  display: inline-block;
-  margin-top: 1px;
-  /* Subtle adjustment for optical alignment */
 }
 
 .export-password-modal .modal-header-center h3 {
