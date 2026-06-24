@@ -108,7 +108,7 @@ const vaultSetupModal = document.getElementById('vault-setup-modal');
 const vaultSetupForm = document.getElementById('vault-setup-form');
 const vaultSetupPassword = document.getElementById('vault-setup-password');
 const vaultSetupConfirm = document.getElementById('vault-setup-confirm');
-
+const mainContainer = document.querySelector('.container');
 const vaultUnlockModal = document.getElementById('vault-unlock-modal');
 const vaultUnlockForm = document.getElementById('vault-unlock-form');
 const vaultUnlockPassword = document.getElementById('vault-unlock-password');
@@ -325,6 +325,7 @@ async function init() {
 
         if (status === 'locked') {
             console.log('Vault locked, showing unlock modal');
+            mainContainer.classList.add('hidden');
             vaultUnlockModal.classList.remove('hidden');
             vaultUnlockPassword.focus();
             return; // Wait for unlock
@@ -332,6 +333,7 @@ async function init() {
 
         if (status === 'uninitialized' || status === 'plaintext') {
             console.log('Vault uninitialized/plaintext, showing setup modal');
+            mainContainer.classList.add('hidden');
             // Force setup for security
             if (vaultSetupModal) {
                 vaultSetupModal.classList.remove('hidden');
@@ -344,6 +346,7 @@ async function init() {
 
         // If unlocked, proceed
         console.log('Vault unlocked, loading connections');
+        mainContainer.classList.remove('hidden');
         await loadAndRenderConnections();
     } catch (e) {
         console.error('Init failed:', e);
@@ -392,6 +395,7 @@ if (vaultSetupForm) {
         const success = await ipcRenderer.invoke('setup-vault', password);
         if (success) {
             vaultSetupModal.classList.add('hidden');
+            mainContainer.classList.remove('hidden');
             await loadAndRenderConnections();
             showNotification('Vault Setup', 'Your vault has been successfully initialized.', 'success');
 
@@ -417,6 +421,7 @@ if (vaultUnlockForm) {
         const success = await ipcRenderer.invoke('unlock-vault', password);
         if (success) {
             vaultUnlockModal.classList.add('hidden');
+            mainContainer.classList.remove('hidden');
             vaultUnlockPassword.value = '';
             await loadAndRenderConnections();
             showNotification('Vault Unlocked', 'Welcome back!', 'success');
@@ -615,9 +620,7 @@ broadcastBtn.onclick = () => {
         renderBroadcastSessionList();
         broadcastModal.classList.remove('hidden');
     } else {
-        broadcastMode = false;
-        broadcastBtn.classList.remove('active');
-        showNotification('Broadcast Deactivated', 'Keystrokes will only be sent to the active terminal.', 'info');
+        toggleBroadcastMode();
     }
 };
 
@@ -821,7 +824,7 @@ closeSettingsBtn.onclick = () => {
 saveSettingsBtn.onclick = () => {
     settings.defaultLogging = prefDefaultLogging.checked;
     settings.logRotationSize = parseInt(prefLogRotationSize.value) || 100;
-    settings.vaultTimeout = parseInt(prefVaultTimeout.value) || 0;
+    settings.vaultTimeout = parseFloat(prefVaultTimeout.value) || 0;
 
     localStorage.setItem('owl_settings', JSON.stringify(settings));
 
@@ -839,7 +842,9 @@ function startIdleTimer() {
     lastActivityTime = Date.now();
 
     if (settings.vaultTimeout > 0) {
-        idleInterval = setInterval(checkIdleTime, 60000); // Check every minute
+        // Use a shorter interval if timeout is very short (e.g. 10s)
+        const interval = settings.vaultTimeout < 1 ? 5000 : 60000;
+        idleInterval = setInterval(checkIdleTime, interval);
         checkIdleTime();
     }
 }
@@ -857,6 +862,9 @@ function checkIdleTime() {
 
 async function lockVault() {
     await ipcRenderer.invoke('lock-vault');
+
+    // Hide Main UI
+    mainContainer.classList.add('hidden');
 
     // Clear UI Data
     connections = [];
@@ -1777,8 +1785,7 @@ function activateSession(sessionId) {
 
         // Deactivate broadcast if it was on
         if (broadcastMode) {
-            broadcastMode = false;
-            broadcastBtn.classList.remove('active');
+            toggleBroadcastMode();
         }
     }
 }
@@ -3084,6 +3091,10 @@ function navigateLogSearch(direction) {
 // Global Modal Closing Logic
 window.addEventListener('click', (event) => {
     if (event.target.classList.contains('modal')) {
+        // Don't close vault modals by clicking outside
+        if (event.target.id === 'vault-unlock-modal' || event.target.id === 'vault-setup-modal') {
+            return;
+        }
         event.target.classList.add('hidden');
     }
 });
@@ -3284,7 +3295,7 @@ function renderSnippets(filter = '') {
         const item = document.createElement('div');
         item.className = 'palette-item';
         item.innerHTML = `
-            <label class="checkbox-container" onclick="event.stopPropagation()" style="margin-right: 12px; padding-left: 24px;">
+            <label class="checkbox-container" onclick="event.stopPropagation()">
                 <input type="checkbox" class="snippet-checkbox" data-id="${sanitizeHTML(snippet.id)}">
                 <span class="checkmark"></span>
             </label>
