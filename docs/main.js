@@ -53,10 +53,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const nav = document.querySelector('nav');
     window.addEventListener('scroll', () => {
         if (window.scrollY > 50) {
-            nav.style.background = 'rgba(10, 10, 12, 0.95)';
+            nav.style.background = 'rgba(10, 6, 20, 0.95)';
             nav.style.padding = '1rem 10%';
         } else {
-            nav.style.background = 'rgba(10, 10, 12, 0.8)';
+            nav.style.background = 'rgba(10, 6, 20, 0.78)';
             nav.style.padding = '2rem 10%';
         }
     });

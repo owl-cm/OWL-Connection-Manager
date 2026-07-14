@@ -16,14 +16,14 @@
 - **Zero-Trust Security**: Your credentials never leave your machine. Everything is stored in a local, AES-256 encrypted vault protected by your master password.
 - **Native Performance**: Powered by `node-pty` and `xterm.js`, OWL provides a near-native terminal experience with extremely low latency.
 - **Privacy First**: No cloud accounts, no telemetry, and no data collection. Your infrastructure data belongs to you.
-- **Modern Aesthetics**: A departure from the "boring gray" terminal apps. OWL is designed to be a joy to look at, featuring glassmorphism, smooth transitions, and a curated dark theme.
+- **Modern Aesthetics**: A departure from the "boring gray" terminal apps. OWL uses a curated **dark purple** glass theme with smooth transitions and dock accents.
 
 ---
 
 ## ✨ Key Features in Detail
 
 ### 🎨 Premium User Experience (UX)
-- **Modern Glassmorphism UI**: A sleek, semi-transparent design with smooth animations and a curated color palette.
+- **Modern Glassmorphism UI**: Dark purple glass panels, violet accents, and feature-colored dock chips.
 - **Interactive Onboarding**: A guided tour for new users to quickly master the interface and discover hidden gems.
 - **Responsive Layout**: Optimized for various screen sizes with a collapsible sidebar and flexible workspace.
 - **Custom Color Labels**: Color-code your connections (e.g., Red for Production, Green for Dev) for instant visual recognition.
@@ -31,16 +31,26 @@
 
 ### 🔒 Enterprise-Grade Security
 - **Secure Credential Vault**: All sensitive data (passwords, passphrases, keys) is encrypted using **AES-256-GCM** with **PBKDF2** key derivation (100,000 iterations).
-- **Master Password Protection**: Access your connections only after unlocking the vault.
+- **Master Password Protection**: Access your connections only after unlocking the vault. Forgot it? Use **Reset vault** on the unlock screen (deletes all local vault data).
 - **Session Auto-Lock**: Configurable idle timeout that automatically locks the application after a period of inactivity.
 - **Hardened Security Policies**: Implements strict Content Security Policy (CSP) and Electron security best practices (context isolation, disabled node integration in renderer).
 - **Secure IPC Bridge**: All communication between the renderer and main process is handled through a strictly defined preload script.
 
 ### 🚀 Advanced SSH & Terminal Capabilities
-- **Broadcast Mode**: Synchronize your input across all active terminal panes—perfect for executing the same command on multiple servers at once.
+- **Broadcast Mode**: Synchronize your input across selected active terminal sessions—perfect for executing the same command on multiple servers at once.
 - **Bastion/Jump Host Support**: Integrated **ProxyJump** configuration to easily connect to servers behind firewalls.
+- **Advanced SSH Options**: Collapsible per-connection OpenSSH `-o` presets (keepalives, compression, agent forwarding, and more), off by default, plus custom options.
 - **Automated Login**: Intelligent handling of password and passphrase prompts, including automated "yes" for new host fingerprint confirmations.
 - **High-Performance Terminal**: Full support for colors, mouse events, and resizing via `xterm.js`.
+
+### ✨ OWL Sage AI Copilot
+- **Multi-provider AI**: OpenAI, Anthropic, Google Gemini, or any LiteLLM / OpenAI-compatible gateway.
+- **Context tools**: Attach terminal selection, recent output, or a Diagnose snapshot (metrics, processes, Docker).
+- **Encrypted keys**: Provider credentials stay in the vault; optional secret redaction before requests.
+
+### 🐳 Docker Explorer
+- Browse containers, images, and volumes over SSH.
+- Common container actions and live log streaming from the dock.
 
 ### 📂 SFTP File Explorer
 - **Graphical File Management**: A dedicated panel for browsing remote directories without leaving the app.

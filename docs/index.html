@@ -71,33 +71,43 @@
             <div class="features-grid">
                 <div class="feature-card">
                     <div class="feature-icon"><i data-lucide="layout"></i></div>
-                    <h3>Modern Interface</h3>
-                    <p>A clean, dark-themed UI with smooth transitions and optimized layouts.</p>
+                    <h3>Purple Dark UI</h3>
+                    <p>Glassmorphism workspace with a curated violet palette, smooth motion, and dock-based tools.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon"><i data-lucide="shield-check"></i></div>
-                    <h3>Secure Storage</h3>
-                    <p>Local AES-256 encryption. Your credentials never leave your machine.</p>
+                    <h3>Secure Vault</h3>
+                    <p>Local AES-256-GCM encryption with master password, auto-lock, and vault reset when needed.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon"><i data-lucide="terminal"></i></div>
-                    <h3>Terminal</h3>
-                    <p>Built on xterm.js with support for broadcast mode and bastion hosts.</p>
+                    <h3>SSH Terminal</h3>
+                    <p>xterm.js sessions with broadcast mode, bastion ProxyJump, and advanced OpenSSH options.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i data-lucide="sparkles"></i></div>
+                    <h3>OWL Sage</h3>
+                    <p>AI copilot for diagnostics and commands via OpenAI, Anthropic, Gemini, or LiteLLM.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon"><i data-lucide="folder-tree"></i></div>
-                    <h3>File Manager</h3>
-                    <p>Integrated SFTP explorer with drag-and-drop support and directory insights.</p>
+                    <h3>SFTP Explorer</h3>
+                    <p>Integrated file manager with drag-and-drop uploads and directory insights.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i data-lucide="container"></i></div>
+                    <h3>Docker Explorer</h3>
+                    <p>Browse containers, images, and volumes with live logs from the same SSH session.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon"><i data-lucide="activity"></i></div>
                     <h3>Monitoring</h3>
-                    <p>Real-time tracking for CPU, RAM, and Disk usage on remote hosts.</p>
+                    <p>Live CPU, RAM, and disk metrics plus a remote process manager.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon"><i data-lucide="command"></i></div>
-                    <h3>Automation</h3>
-                    <p>Quickly access snippets and common commands via the command palette.</p>
+                    <h3>Snippets & Logs</h3>
+                    <p>Command snippets, session logging, and a searchable log viewer with rotation.</p>
                 </div>
             </div>
         </section>
@@ -110,13 +120,16 @@
                     stored locally on your machine.</p>
                 <ul style="list-style: none; margin-top: 2rem; display: flex; flex-direction: column; gap: 1rem;">
                     <li style="display: flex; align-items: center; gap: 1rem; color: var(--text-dim);">
-                        <i data-lucide="check-circle" style="color: #22c55e;"></i> Local-only storage (No Cloud)
+                        <i data-lucide="check-circle" style="color: var(--success);"></i> Local-only storage (No Cloud)
                     </li>
                     <li style="display: flex; align-items: center; gap: 1rem; color: var(--text-dim);">
-                        <i data-lucide="check-circle" style="color: #22c55e;"></i> Master Password Protection
+                        <i data-lucide="check-circle" style="color: var(--success);"></i> Master Password Protection
                     </li>
                     <li style="display: flex; align-items: center; gap: 1rem; color: var(--text-dim);">
-                        <i data-lucide="check-circle" style="color: #22c55e;"></i> Session Auto-Lock
+                        <i data-lucide="check-circle" style="color: var(--success);"></i> Session Auto-Lock
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 1rem; color: var(--text-dim);">
+                        <i data-lucide="check-circle" style="color: var(--success);"></i> Vault Reset (destructive wipe)
                     </li>
                 </ul>
             </div>

@@ -11,13 +11,19 @@ permissions:
   pages: write
   id-token: write
 
+env:
+  RELEASE_TAG: v2.0.0
+  RELEASE_VERSION: '2.0.0'
+
 jobs:
   build:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout develop
         uses: actions/checkout@v4
+        with:
+          ref: develop
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -33,38 +39,24 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Get tag from PR labels
-        id: pr-tag
-        run: |
-          TAG=$(echo '${{ toJson(github.event.pull_request.labels.*.name) }}' | jq -r '.[] | select(startswith("v"))' | head -n 1)
-          if [ -z "$TAG" ]; then
-            echo "No version label (starting with 'v') found on PR. Skipping release."
-            echo "should_release=false" >> $GITHUB_OUTPUT
-          else
-            echo "tag=$TAG" >> $GITHUB_OUTPUT
-            echo "version=${TAG#v}" >> $GITHUB_OUTPUT
-            echo "should_release=true" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Update package.json version
-        if: steps.pr-tag.outputs.should_release == 'true'
-        run: npm version ${{ steps.pr-tag.outputs.version }} --no-git-tag-version
+      - name: Set package version
+        run: npm version ${{ env.RELEASE_VERSION }} --no-git-tag-version
 
       - name: Build .deb package
-        if: steps.pr-tag.outputs.should_release == 'true'
         run: npm run build:deb
         env:
-          APP_VERSION: ${{ steps.pr-tag.outputs.version }}
+          APP_VERSION: ${{ env.RELEASE_VERSION }}
 
-      - name: Create Release
-        if: steps.pr-tag.outputs.should_release == 'true'
-        id: create_release
+      - name: Create or update release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.pr-tag.outputs.tag }}
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: ${{ env.RELEASE_TAG }}
+          target_commitish: develop
           files: dist/installers/*.deb
           draft: false
           prerelease: false
+          make_latest: true
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -72,14 +64,15 @@ jobs:
   deploy-pages:
     runs-on: ubuntu-latest
     needs: build
-    if: needs.build.result == 'success' && (github.event.pull_request.merged == true)
+    if: needs.build.result == 'success' && github.event.pull_request.merged == true
     steps:
-      - name: Checkout code
+      - name: Checkout develop
         uses: actions/checkout@v4
+        with:
+          ref: develop
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
- 
