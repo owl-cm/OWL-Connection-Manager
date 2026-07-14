@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Documentation | OWL - Connection Manager</title>
     <meta name="description"
-        content="Comprehensive documentation for OWL Connection Manager. Learn about features, security, and usage.">
+        content="Comprehensive documentation for OWL Connection Manager. Learn about features, security, Sage AI, Docker, and usage.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -14,7 +14,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Fallback critical styles to ensure layout works even if CSS is cached */
+        /* Fallback critical styles aligned with purple theme */
         .docs-container {
             display: flex;
             min-height: 100vh;
@@ -27,9 +27,9 @@
             position: fixed;
             left: 0;
             top: 100px;
-            background: rgba(10, 10, 12, 0.4);
+            background: rgba(14, 8, 28, 0.72);
             backdrop-filter: blur(20px);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            border-right: 1px solid rgba(167, 139, 250, 0.16);
             padding: 2.5rem;
             overflow-y: auto;
             z-index: 90;
@@ -43,7 +43,7 @@
         }
 
         .sidebar-links a {
-            color: #94a3b8;
+            color: #a89bc4;
             text-decoration: none;
             display: block;
             padding: 0.6rem 1rem;
@@ -51,8 +51,9 @@
         }
 
         .sidebar-links a.active {
-            background: rgba(255, 255, 255, 0.03);
-            color: #f8fafc;
+            background: rgba(167, 139, 250, 0.14);
+            color: #f3eefc;
+            border: 1px solid rgba(167, 139, 250, 0.28);
         }
 
         @media (max-width: 1024px) {
@@ -108,6 +109,7 @@
                         <a href="#security">Secure Vault</a>
                         <a href="#master-password">Master Password</a>
                         <a href="#auto-lock">Auto-Lock System</a>
+                        <a href="#vault-reset">Vault Reset</a>
                     </div>
                 </div>
                 <div class="sidebar-section">
@@ -116,6 +118,7 @@
                         <a href="#connection-management">Connection Tree</a>
                         <a href="#folders-labels">Folders & Labels</a>
                         <a href="#smart-cloning">Smart Cloning</a>
+                        <a href="#advanced-ssh-options">Advanced SSH Options</a>
                     </div>
                 </div>
                 <div class="sidebar-section">
@@ -132,6 +135,8 @@
                     <div class="sidebar-links">
                         <a href="#file-explorer">SFTP Explorer</a>
                         <a href="#monitoring">Metrics & Processes</a>
+                        <a href="#docker-explorer">Docker Explorer</a>
+                        <a href="#owl-sage">OWL Sage AI</a>
                     </div>
                 </div>
                 <div class="sidebar-section">
@@ -153,9 +158,16 @@
                     provides a unified, secure, and aesthetically superior environment for managing remote
                     infrastructure across multiple protocols.</p>
 
-                <p>This documentation provides a comprehensive technical overview of OWL's architecture, security model,
-                    and feature set. Whether you are managing a single server or a complex multi-cloud environment, OWL
-                    is engineered to streamline your workflow.</p>
+                <p>This documentation covers OWL's security model, SSH tooling, Docker explorer, OWL Sage AI copilot,
+                    and day-to-day workflows. Whether you manage one server or a multi-environment fleet, OWL is built to
+                    keep credentials local and operations fast.</p>
+
+                <div class="info-box">
+                    <h5>Visual identity</h5>
+                    <p>OWL’s UI uses a dark purple glass theme (<code>#0a0614</code> base, violet accents
+                        <code>#a78bfa</code> / <code>#7c3aed</code>). This documentation site follows the same palette.
+                    </p>
+                </div>
             </section>
 
             <section id="installation">
@@ -165,8 +177,7 @@
 
                 <h3>Debian-based Distributions (.deb)</h3>
                 <p>The recommended way to install OWL on Ubuntu, Debian, or Linux Mint is via the official package. You
-                    can download the latest stable release from <a href="#" id="direct-download-link"
-                        style="color: var(--primary); font-weight: 600;">here</a>.</p>
+                    can download the latest stable release from <a href="#" id="direct-download-link">here</a>.</p>
 
                 <p>Once downloaded, execute the following commands in your terminal:</p>
                 <pre><code>sudo dpkg -i owl-connection-manager_*.deb
@@ -196,7 +207,8 @@ npm start</code></pre>
                 <h3 id="secure-vault">The Secure Vault</h3>
                 <p>All connection metadata, including passwords, private key paths, and passphrases, is stored in a
                     local JSON vault. This vault is encrypted using <strong>AES-256-GCM</strong> (Galois/Counter Mode),
-                    providing both confidentiality and authenticity.</p>
+                    providing both confidentiality and authenticity. OWL Sage settings are stored in a separate
+                    encrypted file under the same vault key.</p>
 
                 <h3 id="master-password">Master Password & Key Derivation</h3>
                 <p>Upon initial launch, you are required to establish a Master Password. OWL uses the
@@ -204,31 +216,47 @@ npm start</code></pre>
                         iterations</strong> and a unique salt to derive the encryption key.
                 </p>
                 <p><strong>Important:</strong> OWL does not store your Master Password. If lost, the encrypted vault
-                    cannot be recovered.</p>
+                    cannot be recovered unless you reset the vault (which permanently deletes stored data).</p>
 
                 <h3 id="auto-lock">Session Auto-Lock</h3>
-                <p>To protect against unauthorized physical access, OWL includes a configurable inactivity timer. When
-                    triggered, the application securely clears the encryption key from memory and returns to the lock
-                    screen, requiring the Master Password to resume operations.</p>
+                <p>To protect against unauthorized physical access, OWL includes a configurable inactivity timer in
+                    Preferences. When triggered, the application securely clears the encryption key from memory and
+                    returns to the lock screen, requiring the Master Password to resume operations.</p>
+
+                <h3 id="vault-reset">Vault Reset</h3>
+                <p>On the unlock screen, <strong>Reset vault (deletes all data)</strong> permanently removes the
+                    encrypted connections vault and Sage configuration from local storage, then walks you through
+                    creating a new master password. This cannot be undone—export a backup first if you need to keep your
+                    connections.</p>
             </section>
 
             <section id="connection-management">
                 <h2><i data-lucide="share-2"></i> Connection Management</h2>
-                <p>OWL features a sophisticated hierarchical management system that allows you to organize thousands of
-                    connections with ease.</p>
+                <p>OWL features a hierarchical management system that lets you organize large inventories of servers and
+                    jump hosts.</p>
 
                 <h3 id="folders-labels">Hierarchical Organization & Labels</h3>
                 <p>Connections can be organized into nested folders, allowing you to mirror your infrastructure's
-                    logical layout (e.g., Region > Environment > Service). </p>
-                <p>Use <strong>Color Labels</strong> to categorize connections by importance or environment (e.g., Red
-                    for Production, Green for Development). These labels provide instant visual cues in the connection
-                    tree and terminal tabs.</p>
+                    logical layout (e.g., Region &gt; Environment &gt; Service).</p>
+                <p>Use <strong>Color Labels</strong> on folders to categorize by importance or environment (e.g., Red
+                    for Production, Green for Development). Labels provide visual cues in the connection tree.</p>
 
                 <h3 id="smart-cloning">Smart Cloning</h3>
-                <p>The Smart Cloning feature allows you to duplicate existing connection configurations with a single
-                    click. The cloned connection inherits all settings (excluding unique identifiers) and is
-                    automatically placed within the same parent folder, significantly reducing setup time for server
-                    clusters.</p>
+                <p>Smart Cloning duplicates an existing connection (including advanced SSH options and bastion fields)
+                    into the same parent folder, which is useful when provisioning similar hosts.</p>
+
+                <h3 id="advanced-ssh-options">Advanced SSH Options</h3>
+                <p>When creating or editing an SSH connection, expand <strong>Advanced SSH Options</strong> to enable
+                    popular OpenSSH <code>-o</code> settings. Presets ship disabled by default and include keepalives,
+                    connect timeout, compression, agent forwarding, host-key policy, and authentication preferences.
+                    You can:</p>
+                <ul>
+                    <li>Toggle individual options on or off</li>
+                    <li>Edit option values before enabling</li>
+                    <li>Add custom option names and values</li>
+                </ul>
+                <p>Enabled options are passed to the OpenSSH CLI when opening a terminal. Select keepalive and timeout
+                    options are also mapped into the ssh2 client used for SFTP and Docker tools.</p>
             </section>
 
             <section id="terminal-capabilities">
@@ -243,8 +271,8 @@ npm start</code></pre>
                     <li><strong>Full Mouse Integration</strong> for applications like <code>htop</code>,
                         <code>vim</code>, and <code>tmux</code>.
                     </li>
-                    <li><strong>Automated Authentication</strong>: Seamless handling of password prompts and SSH agent
-                        integration.</li>
+                    <li><strong>Automated Authentication</strong>: Seamless handling of password and passphrase prompts,
+                        plus automatic acceptance of new host fingerprints when prompted.</li>
                 </ul>
 
                 <h3 id="remote-protocols">RDP & VNC Support</h3>
@@ -252,77 +280,100 @@ npm start</code></pre>
                     manage Windows and graphical Linux environments from the same unified interface.</p>
 
                 <h3 id="broadcast-mode">Broadcast Mode (Multi-Exec)</h3>
-                <p>Broadcast Mode allows you to synchronize input across all active terminal sessions. Commands typed in
-                    the primary pane are instantly executed on all other connected hosts, making it an essential tool
-                    for fleet-wide updates or configuration checks.</p>
+                <p>Broadcast Mode allows you to synchronize input across selected active terminal sessions. Commands typed in
+                    the primary session are sent to all chosen hosts—ideal for fleet-wide updates or checks.</p>
 
                 <h3 id="bastion-hosts">Bastion & Jump Host Integration</h3>
                 <p>OWL simplifies access to private networks through integrated <strong>ProxyJump</strong> support. You
-                    can configure a Bastion host as a gateway, and OWL will automatically handle the multi-hop SSH
-                    tunnel transparently.</p>
+                    can configure a Bastion host as a gateway, and OWL will automatically handle the multi-hop SSH path
+                    transparently for terminals and remote tools.</p>
             </section>
 
             <section id="file-explorer">
                 <h2><i data-lucide="folder-tree"></i> SFTP File Explorer</h2>
-                <p>The integrated SFTP explorer provides a powerful graphical interface for remote file management,
-                    eliminating the need for external clients.</p>
+                <p>The integrated SFTP explorer provides a graphical interface for remote file management without leaving
+                    OWL.</p>
 
                 <ul>
-                    <li><strong>Drag-and-Drop</strong>: Seamlessly upload files and directories by dragging them from
-                        your local file manager.</li>
-                    <li><strong>Directory Insights</strong>: Instantly calculate remote directory sizes using optimized
-                        background processes.</li>
-                    <li><strong>Breadcrumb Navigation</strong>: Rapidly navigate complex remote filesystems with an
-                        interactive path bar.</li>
+                    <li><strong>Drag-and-Drop</strong>: Upload files by dragging them from your local file manager.</li>
+                    <li><strong>Directory Insights</strong>: Calculate remote directory sizes using optimized background
+                        processes.</li>
+                    <li><strong>Breadcrumb Navigation</strong>: Navigate complex remote filesystems with an interactive
+                        path bar.</li>
                 </ul>
             </section>
 
             <section id="monitoring">
                 <h2><i data-lucide="activity"></i> Real-Time Monitoring & Insights</h2>
-                <p>Gain immediate visibility into the health and performance of your remote systems without executing
-                    manual commands.</p>
+                <p>Gain visibility into host health without running manual commands for every check.</p>
 
                 <h3>Metrics Dashboard</h3>
-                <p>OWL streams real-time telemetry from connected hosts, providing live visualizations for:</p>
+                <p>OWL streams live telemetry from connected hosts for:</p>
                 <ul>
-                    <li><strong>CPU Load</strong>: Per-core and aggregate utilization.</li>
-                    <li><strong>Memory Usage</strong>: Detailed breakdown of RAM and Swap usage.</li>
-                    <li><strong>Disk I/O & Capacity</strong>: Real-time tracking of storage availability.</li>
+                    <li><strong>CPU</strong> utilization</li>
+                    <li><strong>Memory</strong> usage</li>
+                    <li><strong>Disk</strong> capacity</li>
                 </ul>
 
                 <h3>Remote Process Manager</h3>
-                <p>The built-in Process Manager allows you to monitor running tasks on the remote host. You can search
-                    for specific processes, sort by resource consumption, and terminate (kill) processes directly from
+                <p>The Process Manager lists remote tasks so you can search, inspect, and kill processes directly from
                     the UI.</p>
+            </section>
+
+            <section id="docker-explorer">
+                <h2><i data-lucide="container"></i> Docker Explorer</h2>
+                <p>For SSH hosts with Docker available, the Docker Explorer lists containers, images, and volumes. You
+                    can inspect resources, run common container actions (start/stop/restart/remove), and stream live
+                    container logs from the dock without switching tools.</p>
+            </section>
+
+            <section id="owl-sage">
+                <h2><i data-lucide="sparkles"></i> OWL Sage AI Copilot</h2>
+                <p>OWL Sage is an optional AI assistant embedded in the workspace. Configure it under
+                    <strong>Preferences</strong>, then open it from the dock or with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd>.
+                </p>
+
+                <h3>Providers</h3>
+                <p>Sage supports multiple providers:</p>
+                <ul>
+                    <li><strong>LiteLLM</strong> — any OpenAI-compatible gateway (custom base URL)</li>
+                    <li><strong>OpenAI</strong></li>
+                    <li><strong>Anthropic</strong></li>
+                    <li><strong>Google Gemini</strong></li>
+                </ul>
+                <p>API keys are stored encrypted in your vault. Optional redaction strips secrets from context before
+                    they are sent to the provider.</p>
+
+                <h3>Context tools</h3>
+                <ul>
+                    <li><strong>Selection</strong> — attach highlighted terminal text</li>
+                    <li><strong>Terminal</strong> — attach recent buffer output</li>
+                    <li><strong>Diagnose</strong> — snapshot metrics, top processes, Docker status, and recent lines</li>
+                </ul>
+                <p>Suggested shell commands can be copied or run in the active terminal after confirmation.</p>
             </section>
 
             <section id="advanced-features">
                 <h2><i data-lucide="cpu"></i> Advanced Management Features</h2>
 
                 <h3 id="command-palette">Command Palette</h3>
-                <p>The Command Palette (<code>Ctrl + Shift + P</code>) is the central nervous system of OWL. It provides
-                    a searchable, keyboard-driven interface to access every feature, connection, and snippet within the
-                    application.</p>
+                <p>The Command Palette (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>) provides a searchable,
+                    keyboard-driven interface for snippets and quick actions.</p>
 
                 <h3 id="snippets">Command Snippets</h3>
-                <p>Save frequently used commands or complex scripts as Snippets. Snippets can be executed with a single
-                    click or through the Command Palette, ensuring consistency and reducing the risk of manual entry
-                    errors.</p>
+                <p>Save frequently used commands or scripts as Snippets and run them with a click or via the palette.</p>
 
                 <h3 id="session-logging">Advanced Session Logging</h3>
-                <p>OWL can automatically record every terminal session for auditing and compliance. The built-in Log
-                    Viewer features:</p>
+                <p>OWL can automatically record terminal sessions. The Log Viewer supports:</p>
                 <ul>
-                    <li><strong>Timeframe Filtering</strong>: Quickly locate logs from specific dates or ranges.</li>
-                    <li><strong>Full-Text Search</strong>: Search through thousands of lines of log data instantly.</li>
-                    <li><strong>Log Rotation</strong>: Automated management of log file sizes to prevent local disk
-                        exhaustion.</li>
+                    <li><strong>Timeframe Filtering</strong> — locate logs by date range</li>
+                    <li><strong>Full-Text Search</strong> — search across log content</li>
+                    <li><strong>Log Rotation</strong> — remove oldest logs when total size exceeds your Preferences limit</li>
                 </ul>
 
                 <h3 id="backups">Encrypted Backups</h3>
-                <p>Export your entire OWL configuration, including connections and snippets, into a single encrypted
-                    backup file. This allows for secure migration between workstations while maintaining the integrity
-                    of your sensitive data.</p>
+                <p>Export your connections into a password-protected backup and import them on another machine. Prefer a
+                    backup before resetting the vault.</p>
             </section>
         </main>
     </div>
@@ -342,7 +393,6 @@ npm start</code></pre>
     <script>
         lucide.createIcons();
 
-        // GitHub Releases Integration for Documentation
         const REPO = 'owl-cm/OWL-Connection-Manager';
         const directDownloadLink = document.getElementById('direct-download-link');
         const navDownloadBtn = document.getElementById('nav-download-btn');
@@ -365,7 +415,6 @@ npm start</code></pre>
         }
         fetchLatestRelease();
 
-        // Smooth scrolling for sidebar links
         document.querySelectorAll('.sidebar-links a').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -378,18 +427,15 @@ npm start</code></pre>
                         behavior: 'smooth'
                     });
 
-                    // Update active state
                     document.querySelectorAll('.sidebar-links a').forEach(a => a.classList.remove('active'));
                     this.classList.add('active');
                 }
             });
         });
 
-        // Update active link on scroll
         window.addEventListener('scroll', () => {
             const navLinks = document.querySelectorAll('.sidebar-links a');
             const scrollPos = window.pageYOffset || document.documentElement.scrollTop;
-
             let currentId = '';
 
             navLinks.forEach(link => {
