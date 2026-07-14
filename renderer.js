@@ -60,6 +60,72 @@ function showNotification(title, message, type = 'success', duration = 5000) {
     };
 }
 
+let confirmModalResolver = null;
+
+function showConfirm({
+    title = 'Are you sure?',
+    message = '',
+    confirmText = 'Confirm',
+    cancelText = 'Cancel',
+    variant = 'danger'
+} = {}) {
+    const confirmModal = document.getElementById('confirm-modal');
+    const confirmModalTitle = document.getElementById('confirm-modal-title');
+    const confirmModalMessage = document.getElementById('confirm-modal-message');
+    const confirmModalOkBtn = document.getElementById('confirm-modal-ok-btn');
+    const confirmModalCancelBtn = document.getElementById('confirm-modal-cancel-btn');
+    const confirmModalIcon = document.getElementById('confirm-modal-icon');
+
+    return new Promise((resolve) => {
+        if (!confirmModal) {
+            resolve(false);
+            return;
+        }
+
+        confirmModalResolver = resolve;
+        confirmModalTitle.textContent = title;
+        confirmModalMessage.textContent = message;
+        confirmModalOkBtn.textContent = confirmText;
+        confirmModalCancelBtn.textContent = cancelText;
+
+        confirmModal.classList.toggle('confirm-danger', variant === 'danger');
+        confirmModalOkBtn.className = variant === 'primary' ? 'btn-primary' : 'btn-danger';
+
+        if (confirmModalIcon) {
+            const iconClass = variant === 'danger' ? 'fa-triangle-exclamation' : 'fa-circle-question';
+            confirmModalIcon.classList.toggle('is-danger', variant === 'danger');
+            confirmModalIcon.innerHTML = `<i class="fas ${iconClass}"></i>`;
+        }
+
+        confirmModal.classList.remove('hidden');
+        confirmModalCancelBtn.focus();
+    });
+}
+
+function closeConfirmModal(result) {
+    const confirmModal = document.getElementById('confirm-modal');
+    if (confirmModal) confirmModal.classList.add('hidden');
+    if (confirmModalResolver) {
+        confirmModalResolver(result);
+        confirmModalResolver = null;
+    }
+}
+
+document.addEventListener('keydown', (e) => {
+    const confirmModal = document.getElementById('confirm-modal');
+    if (e.key === 'Escape' && confirmModal && !confirmModal.classList.contains('hidden')) {
+        e.preventDefault();
+        closeConfirmModal(false);
+    }
+});
+
+(function initConfirmModal() {
+    const confirmModalOkBtn = document.getElementById('confirm-modal-ok-btn');
+    const confirmModalCancelBtn = document.getElementById('confirm-modal-cancel-btn');
+    if (confirmModalOkBtn) confirmModalOkBtn.onclick = () => closeConfirmModal(true);
+    if (confirmModalCancelBtn) confirmModalCancelBtn.onclick = () => closeConfirmModal(false);
+})();
+
 // State
 let connections = []; // Now a tree structure
 let sessions = {};
@@ -86,9 +152,7 @@ const emptyState = document.getElementById('empty-state');
 const contextMenu = document.getElementById('context-menu');
 const actionMenu = document.getElementById('action-menu');
 const tabContextMenu = document.getElementById('tab-context-menu');
-const deleteModal = document.getElementById('delete-modal');
-const deleteConfirmBtn = document.getElementById('delete-confirm-btn');
-const deleteCancelBtn = document.getElementById('delete-cancel-btn');
+const logoutBtn = document.getElementById('logout-btn');
 const exportBtn = document.getElementById('export-btn');
 const importBtn = document.getElementById('import-btn');
 const broadcastModal = document.getElementById('broadcast-modal');
@@ -96,13 +160,6 @@ const broadcastConfirmBtn = document.getElementById('broadcast-confirm-btn');
 const broadcastCancelBtn = document.getElementById('broadcast-cancel-btn');
 const broadcastSelectAll = document.getElementById('broadcast-select-all');
 const broadcastSessionList = document.getElementById('broadcast-session-list');
-const snippetDeleteModal = document.getElementById('snippet-delete-modal');
-const snippetDeleteConfirmBtn = document.getElementById('snippet-delete-confirm-btn');
-const snippetDeleteCancelBtn = document.getElementById('snippet-delete-cancel-btn');
-const snippetDeleteTitle = document.getElementById('snippet-delete-title');
-const snippetDeleteMessage = document.getElementById('snippet-delete-message');
-let snippetToDeleteId = null;
-let snippetsToDeleteIds = [];
 // Vault Elements
 const vaultSetupModal = document.getElementById('vault-setup-modal');
 const vaultSetupForm = document.getElementById('vault-setup-form');
@@ -188,6 +245,55 @@ const processListBody = document.getElementById('process-list-body');
 const refreshProcessesBtn = document.getElementById('refresh-processes');
 const closeProcessModalBtn = document.getElementById('close-process-modal');
 
+// Docker Explorer Elements
+const toggleDockerBtn = document.getElementById('toggle-docker-btn');
+const dockerModal = document.getElementById('docker-modal');
+const dockerModalSubtitle = document.getElementById('docker-modal-subtitle');
+const dockerResourceList = document.getElementById('docker-resource-list');
+const dockerSearch = document.getElementById('docker-search');
+const dockerStatusBanner = document.getElementById('docker-status-banner');
+const dockerDetailsPanel = document.getElementById('docker-details-panel');
+const dockerLogsViewer = document.getElementById('docker-logs-viewer');
+const dockerLogsEmpty = document.getElementById('docker-logs-empty');
+const dockerViewerTitle = document.getElementById('docker-viewer-title');
+const dockerActionBar = document.getElementById('docker-action-bar');
+const dockerStatsEl = document.getElementById('docker-stats');
+const dockerStatRunning = document.getElementById('docker-stat-running');
+const dockerStatContainers = document.getElementById('docker-stat-containers');
+const dockerStatImages = document.getElementById('docker-stat-images');
+const dockerStatVolumes = document.getElementById('docker-stat-volumes');
+const refreshDockerBtn = document.getElementById('refresh-docker');
+const closeDockerHeaderBtn = document.getElementById('close-docker-header-btn');
+const dockerClearLogsBtn = document.getElementById('docker-clear-logs');
+const dockerToggleFollowBtn = document.getElementById('docker-toggle-follow');
+const dockerStopLogsBtn = document.getElementById('docker-stop-logs');
+const toggleSageBtn = document.getElementById('toggle-sage-btn');
+const sagePanel = document.getElementById('sage-panel');
+const sageConnectionBadge = document.getElementById('sage-connection-badge');
+const sageNotConfigured = document.getElementById('sage-not-configured');
+const sagePanelBody = document.getElementById('sage-panel-body');
+const sageMessages = document.getElementById('sage-messages');
+const sageInput = document.getElementById('sage-input');
+const sageSendBtn = document.getElementById('sage-send-btn');
+const sageStopBtn = document.getElementById('sage-stop-btn');
+const sageClearChatBtn = document.getElementById('sage-clear-chat-btn');
+const closeSagePanelBtn = document.getElementById('close-sage-panel-btn');
+const sageOpenSettingsBtn = document.getElementById('sage-open-settings-btn');
+const sageBtnSelection = document.getElementById('sage-btn-selection');
+const sageBtnTerminal = document.getElementById('sage-btn-terminal');
+const sageBtnDiagnose = document.getElementById('sage-btn-diagnose');
+const sageContextPreview = document.getElementById('sage-context-preview');
+const prefSageEnabled = document.getElementById('pref-sage-enabled');
+const prefSageProvider = document.getElementById('pref-sage-provider');
+const prefSageBaseUrl = document.getElementById('pref-sage-base-url');
+const prefSageApiKey = document.getElementById('pref-sage-api-key');
+const prefSageModel = document.getElementById('pref-sage-model');
+const prefSageRedaction = document.getElementById('pref-sage-redaction');
+const sageBaseUrlGroup = document.getElementById('sage-base-url-group');
+const sageBaseUrlHint = document.getElementById('sage-base-url-hint');
+const sageApiKeyHint = document.getElementById('sage-api-key-hint');
+const sageModelHint = document.getElementById('sage-model-hint');
+
 // Settings Elements
 const settingsBtn = document.getElementById('settings-btn');
 const settingsModal = document.getElementById('settings-modal');
@@ -219,6 +325,138 @@ let lastActivityTime = Date.now();
 let idleInterval = null;
 
 let metricsInterval = null;
+
+let dockerExplorerConnection = null;
+let dockerActiveTab = 'containers';
+let dockerContainersCache = null;
+let dockerImagesCache = null;
+let dockerVolumesCache = null;
+let dockerSelectedItem = null;
+let dockerLogStreamId = null;
+let dockerLogsFollow = true;
+let dockerTabLoadedAt = {};
+const DOCKER_CACHE_TTL_MS = 30000;
+
+const SSH_OPTION_PRESETS = [
+    {
+        key: 'ServerAliveInterval',
+        value: '60',
+        description: 'Send keepalive packets every N seconds'
+    },
+    {
+        key: 'ServerAliveCountMax',
+        value: '3',
+        description: 'Disconnect after this many missed keepalives'
+    },
+    {
+        key: 'ConnectTimeout',
+        value: '10',
+        description: 'Seconds to wait for the TCP connection'
+    },
+    {
+        key: 'StrictHostKeyChecking',
+        value: 'accept-new',
+        description: 'Host key policy: yes, no, or accept-new'
+    },
+    {
+        key: 'Compression',
+        value: 'yes',
+        description: 'Enable compression for slower links'
+    },
+    {
+        key: 'ForwardAgent',
+        value: 'yes',
+        description: 'Forward local SSH agent to the remote host'
+    },
+    {
+        key: 'TCPKeepAlive',
+        value: 'yes',
+        description: 'Enable TCP-level keepalive probes'
+    },
+    {
+        key: 'IdentitiesOnly',
+        value: 'yes',
+        description: 'Only use identities explicitly configured'
+    },
+    {
+        key: 'PreferredAuthentications',
+        value: 'publickey,password',
+        description: 'Preferred auth method order'
+    },
+    {
+        key: 'PubkeyAuthentication',
+        value: 'yes',
+        description: 'Allow public key authentication'
+    },
+    {
+        key: 'PasswordAuthentication',
+        value: 'yes',
+        description: 'Allow password authentication'
+    },
+    {
+        key: 'LogLevel',
+        value: 'INFO',
+        description: 'SSH verbosity: QUIET, FATAL, ERROR, INFO, VERBOSE'
+    }
+];
+
+let sshOptionsDraft = [];
+
+const SAGE_PROVIDER_DEFAULTS = {
+    litellm: {
+        label: 'LiteLLM',
+        baseUrl: 'http://localhost:4000/v1',
+        model: 'gpt-4o-mini',
+        requiresBaseUrl: true,
+        baseUrlHint: 'OpenAI-compatible endpoint. LiteLLM default: http://localhost:4000/v1',
+        apiKeyHint: 'Stored encrypted in your vault. Sent only to your LiteLLM gateway.',
+        modelHint: 'Model name as configured in LiteLLM (e.g. gpt-4o-mini, claude-3-5-sonnet).',
+        apiKeyPlaceholder: 'sk-... or your LiteLLM key'
+    },
+    openai: {
+        label: 'OpenAI',
+        baseUrl: 'https://api.openai.com/v1',
+        model: 'gpt-4o-mini',
+        requiresBaseUrl: false,
+        baseUrlHint: 'Optional custom OpenAI-compatible endpoint. Leave blank for api.openai.com.',
+        apiKeyHint: 'Stored encrypted in your vault. Sent only to OpenAI.',
+        modelHint: 'Model name (e.g. gpt-4o-mini, gpt-4.1, o4-mini).',
+        apiKeyPlaceholder: 'sk-...'
+    },
+    anthropic: {
+        label: 'Anthropic',
+        baseUrl: 'https://api.anthropic.com',
+        model: 'claude-sonnet-4-20250514',
+        requiresBaseUrl: false,
+        baseUrlHint: 'Optional custom Anthropic endpoint. Leave blank for api.anthropic.com.',
+        apiKeyHint: 'Stored encrypted in your vault. Sent only to Anthropic.',
+        modelHint: 'Model name (e.g. claude-sonnet-4-20250514, claude-opus-4-20250514).',
+        apiKeyPlaceholder: 'sk-ant-...'
+    },
+    gemini: {
+        label: 'Google Gemini',
+        baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai',
+        model: 'gemini-2.0-flash',
+        requiresBaseUrl: false,
+        baseUrlHint: 'Optional custom Gemini OpenAI-compatible endpoint.',
+        apiKeyHint: 'Stored encrypted in your vault. Sent only to Google Gemini.',
+        modelHint: 'Model name (e.g. gemini-2.0-flash, gemini-2.5-pro).',
+        apiKeyPlaceholder: 'AIza...'
+    }
+};
+
+let sageConfig = {
+    enabled: false,
+    provider: 'litellm',
+    baseUrl: SAGE_PROVIDER_DEFAULTS.litellm.baseUrl,
+    apiKey: '',
+    model: SAGE_PROVIDER_DEFAULTS.litellm.model,
+    redaction: true
+};
+let sageChatHistory = [];
+let sagePendingContext = '';
+let sageStreamId = null;
+let sageIsStreaming = false;
 
 // Helper: Generate ID
 function generateId() {
@@ -260,10 +498,46 @@ function findParent(items, id, parent = null) {
     return null;
 }
 
+function getSageProviderMeta(provider) {
+    return SAGE_PROVIDER_DEFAULTS[provider] || SAGE_PROVIDER_DEFAULTS.litellm;
+}
+
+function normalizeSageProvider(provider) {
+    return SAGE_PROVIDER_DEFAULTS[provider] ? provider : 'litellm';
+}
+
+function updateSageProviderUI(provider, { fillDefaults = false } = {}) {
+    const normalized = normalizeSageProvider(provider);
+    const meta = getSageProviderMeta(normalized);
+
+    if (prefSageProvider) prefSageProvider.value = normalized;
+    if (sageBaseUrlGroup) {
+        sageBaseUrlGroup.classList.toggle('hidden', !meta.requiresBaseUrl);
+    }
+    if (sageBaseUrlHint) sageBaseUrlHint.textContent = meta.baseUrlHint;
+    if (sageApiKeyHint) sageApiKeyHint.textContent = meta.apiKeyHint;
+    if (sageModelHint) sageModelHint.textContent = meta.modelHint;
+    if (prefSageApiKey) prefSageApiKey.placeholder = meta.apiKeyPlaceholder;
+    if (prefSageBaseUrl) prefSageBaseUrl.placeholder = meta.baseUrl;
+    if (prefSageModel) prefSageModel.placeholder = meta.model;
+
+    if (fillDefaults) {
+        if (prefSageBaseUrl) prefSageBaseUrl.value = meta.requiresBaseUrl ? meta.baseUrl : '';
+        if (prefSageModel) prefSageModel.value = meta.model;
+    }
+}
+
 function applySettingsToUI() {
     prefDefaultLogging.checked = settings.defaultLogging;
     prefLogRotationSize.value = settings.logRotationSize;
     if (prefVaultTimeout) prefVaultTimeout.value = settings.vaultTimeout || 0;
+    if (prefSageEnabled) prefSageEnabled.checked = !!sageConfig.enabled;
+    const provider = normalizeSageProvider(sageConfig.provider);
+    updateSageProviderUI(provider);
+    if (prefSageBaseUrl) prefSageBaseUrl.value = sageConfig.baseUrl || '';
+    if (prefSageApiKey) prefSageApiKey.value = sageConfig.apiKey || '';
+    if (prefSageModel) prefSageModel.value = sageConfig.model || getSageProviderMeta(provider).model;
+    if (prefSageRedaction) prefSageRedaction.checked = sageConfig.redaction !== false;
 }
 
 function updateAuthFields() {
@@ -350,6 +624,12 @@ async function init() {
         await loadAndRenderConnections();
     } catch (e) {
         console.error('Init failed:', e);
+        mainContainer.classList.add('hidden');
+        if (vaultUnlockModal) {
+            vaultUnlockModal.classList.remove('hidden');
+        }
+    } finally {
+        document.documentElement.classList.remove('vault-pending');
     }
 }
 
@@ -370,6 +650,8 @@ async function loadAndRenderConnections() {
         settings = JSON.parse(savedSettings);
     }
     applySettingsToUI();
+
+    await loadSageConfig();
 
     // Start Idle Timer
     startIdleTimer();
@@ -436,11 +718,30 @@ if (vaultUnlockForm) {
 if (vaultResetLink) {
     vaultResetLink.addEventListener('click', async (e) => {
         e.preventDefault();
-        if (confirm('WARNING: This will delete ALL your saved connections. This action cannot be undone. Are you sure?')) {
+        if (await showConfirm({
+            title: 'Reset vault?',
+            message: 'WARNING: This will delete ALL your saved connections.\n\nThis action cannot be undone.',
+            confirmText: 'Reset vault',
+            variant: 'danger'
+        })) {
             await ipcRenderer.invoke('reset-vault');
+            connections = [];
+            sageConfig = {
+                enabled: false,
+                provider: 'litellm',
+                baseUrl: SAGE_PROVIDER_DEFAULTS.litellm.baseUrl,
+                apiKey: '',
+                model: SAGE_PROVIDER_DEFAULTS.litellm.model,
+                redaction: true
+            };
+            if (connectionListEl) connectionListEl.innerHTML = '';
             vaultUnlockModal.classList.add('hidden');
+            vaultUnlockPassword.value = '';
+            vaultSetupPassword.value = '';
+            vaultSetupConfirm.value = '';
             vaultSetupModal.classList.remove('hidden');
             vaultSetupPassword.focus();
+            showNotification('Vault Reset', 'All vault data was deleted. Create a new master password.', 'success');
         }
     });
 }
@@ -562,9 +863,10 @@ importBtn.onclick = async () => {
     }
 
     // Direct import (plaintext or same-vault encrypted)
-    connections = migrateData(result);
+    connections = mergeImportedConnections(connections, result);
     await ipcRenderer.invoke('save-connections', connections);
     renderTree(connections, connectionListEl);
+    showNotification('Import Successful', 'Connections have been imported and merged.', 'success');
 };
 
 // Import Decrypt Logic
@@ -578,7 +880,7 @@ if (importDecryptForm) {
 
         if (imported) {
             importDecryptModal.classList.add('hidden');
-            connections = migrateData(imported);
+            connections = mergeImportedConnections(connections, imported);
             await ipcRenderer.invoke('save-connections', connections);
             renderTree(connections, connectionListEl);
             pendingImportFile = null;
@@ -759,7 +1061,12 @@ deleteSelectedLogsBtn.onclick = async () => {
     if (selectedCheckboxes.length === 0) return;
 
     const filenames = Array.from(selectedCheckboxes).map(cb => cb.dataset.filename);
-    if (confirm(`Delete ${filenames.length} selected log file(s)?`)) {
+    if (await showConfirm({
+        title: 'Delete log files?',
+        message: `Delete ${filenames.length} selected log file(s)?`,
+        confirmText: 'Delete',
+        variant: 'danger'
+    })) {
         const success = await ipcRenderer.invoke('delete-logs', filenames);
         if (success) {
             if (filenames.includes(selectedLogFile)) {
@@ -811,6 +1118,114 @@ refreshProcessesBtn.onclick = () => loadProcesses();
 closeProcessModalBtn.onclick = () => processModal.classList.add('hidden');
 document.getElementById('close-process-header-btn').onclick = () => processModal.classList.add('hidden');
 
+// Docker Explorer Listeners
+toggleDockerBtn.onclick = () => {
+    if (toggleDockerBtn.classList.contains('disabled')) return;
+    if (!activeSessionId) return;
+    const session = sessions[activeSessionId];
+    if (!session || !isDockerCapableConnection(session.connection)) return;
+    openDockerExplorer(session.connection);
+};
+
+refreshDockerBtn.onclick = () => refreshDockerView(true);
+closeDockerHeaderBtn.onclick = () => closeDockerExplorer();
+dockerSearch.oninput = () => renderDockerResourceList();
+
+dockerClearLogsBtn.onclick = () => {
+    dockerLogsViewer.textContent = '';
+    dockerLogsEmpty.classList.add('hidden');
+};
+
+dockerToggleFollowBtn.onclick = () => {
+    dockerLogsFollow = !dockerLogsFollow;
+    dockerToggleFollowBtn.classList.toggle('active', dockerLogsFollow);
+};
+
+dockerStopLogsBtn.onclick = () => stopDockerLogStream();
+
+document.querySelectorAll('.docker-tab').forEach(tab => {
+    tab.onclick = async () => {
+        dockerActiveTab = tab.dataset.tab;
+        document.querySelectorAll('.docker-tab').forEach(t => t.classList.toggle('active', t === tab));
+        dockerSelectedItem = null;
+        stopDockerLogStream();
+        resetDockerViewer();
+        await loadDockerTab(dockerActiveTab);
+    };
+});
+
+ipcRenderer.on('docker-logs-stream-data', (event, { streamId, chunk }) => {
+    if (streamId !== dockerLogStreamId) return;
+    dockerLogsEmpty.classList.add('hidden');
+    dockerLogsViewer.textContent += chunk;
+    if (dockerLogsFollow) {
+        dockerLogsViewer.scrollTop = dockerLogsViewer.scrollHeight;
+    }
+});
+
+ipcRenderer.on('docker-logs-stream-end', (event, { streamId }) => {
+    if (streamId !== dockerLogStreamId) return;
+    dockerLogStreamId = null;
+    dockerLogsViewer.textContent += '\n[stream ended]\n';
+});
+
+// OWL Sage Listeners
+if (toggleSageBtn) {
+    toggleSageBtn.onclick = () => {
+        if (toggleSageBtn.classList.contains('disabled')) return;
+        toggleSagePanel();
+    };
+}
+if (closeSagePanelBtn) closeSagePanelBtn.onclick = () => closeSagePanel();
+if (sageOpenSettingsBtn) {
+    sageOpenSettingsBtn.onclick = () => {
+        applySettingsToUI();
+        settingsModal.classList.remove('hidden');
+    };
+}
+if (sageSendBtn) sageSendBtn.onclick = () => sendSageMessage();
+if (sageStopBtn) sageStopBtn.onclick = () => stopSageStream();
+if (sageClearChatBtn) sageClearChatBtn.onclick = () => clearSageChat();
+if (sageBtnSelection) sageBtnSelection.onclick = () => attachSageSelection();
+if (sageBtnTerminal) sageBtnTerminal.onclick = () => attachSageTerminalContext();
+if (sageBtnDiagnose) sageBtnDiagnose.onclick = () => attachSageDiagnoseContext();
+if (prefSageProvider) {
+    prefSageProvider.onchange = () => {
+        updateSageProviderUI(prefSageProvider.value, { fillDefaults: true });
+    };
+}
+if (sageInput) {
+    sageInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendSageMessage();
+        }
+    });
+}
+
+ipcRenderer.on('sage-stream-chunk', (event, { streamId, chunk }) => {
+    if (streamId !== sageStreamId) return;
+    appendSageStreamChunk(chunk);
+});
+
+ipcRenderer.on('sage-stream-end', (event, { streamId }) => {
+    if (streamId !== sageStreamId) return;
+    finishSageStream();
+});
+
+ipcRenderer.on('sage-stream-error', (event, { streamId, error }) => {
+    if (streamId !== sageStreamId) return;
+    finishSageStream(error);
+});
+
+window.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.shiftKey && e.code === 'KeyI') {
+        e.preventDefault();
+        if (!toggleSageBtn || toggleSageBtn.classList.contains('disabled')) return;
+        toggleSagePanel(true);
+    }
+});
+
 // Settings Listeners
 settingsBtn.onclick = () => {
     applySettingsToUI();
@@ -821,17 +1236,33 @@ closeSettingsBtn.onclick = () => {
     settingsModal.classList.add('hidden');
 };
 
-saveSettingsBtn.onclick = () => {
+saveSettingsBtn.onclick = async () => {
     settings.defaultLogging = prefDefaultLogging.checked;
     settings.logRotationSize = parseInt(prefLogRotationSize.value) || 100;
     settings.vaultTimeout = parseFloat(prefVaultTimeout.value) || 0;
 
     localStorage.setItem('owl_settings', JSON.stringify(settings));
 
+    const newApiKey = prefSageApiKey ? prefSageApiKey.value.trim() : '';
+    const provider = normalizeSageProvider(prefSageProvider ? prefSageProvider.value : sageConfig.provider);
+    const meta = getSageProviderMeta(provider);
+    sageConfig = {
+        enabled: prefSageEnabled ? prefSageEnabled.checked : false,
+        provider,
+        baseUrl: prefSageBaseUrl ? prefSageBaseUrl.value.trim() : '',
+        apiKey: newApiKey || sageConfig.apiKey,
+        model: prefSageModel ? prefSageModel.value.trim() || meta.model : meta.model,
+        redaction: prefSageRedaction ? prefSageRedaction.checked : true
+    };
+    await ipcRenderer.invoke('save-sage-config', sageConfig);
+    updateDockButtonsState();
+    updateSagePanelState();
+
     // Restart idle timer
     startIdleTimer();
 
     settingsModal.classList.add('hidden');
+    showNotification('Settings', 'Preferences saved.', 'success');
 };
 
 // --- Auto-Lock Logic ---
@@ -861,22 +1292,41 @@ function checkIdleTime() {
 }
 
 async function lockVault() {
+    if (sagePanel) {
+        sagePanel.classList.add('hidden');
+        document.body.classList.remove('sage-panel-open');
+    }
+
+    document.querySelectorAll('.modal').forEach((m) => m.classList.add('hidden'));
+
+    Object.keys(sessions).slice().forEach((id) => closeSession(id));
+    activeSessionId = null;
+
     await ipcRenderer.invoke('lock-vault');
 
-    // Hide Main UI
     mainContainer.classList.add('hidden');
-
-    // Clear UI Data
     connections = [];
     connectionListEl.innerHTML = '';
 
-    // Stop Timer
     if (idleInterval) clearInterval(idleInterval);
 
-    // Show Unlock Modal
     vaultUnlockModal.classList.remove('hidden');
     vaultUnlockPassword.value = '';
     vaultUnlockPassword.focus();
+}
+
+if (logoutBtn) {
+    logoutBtn.onclick = async () => {
+        if (!await showConfirm({
+            title: 'Lock session?',
+            message: 'Lock vault and end your session?\n\nAll open terminals will be closed. You will need your master password to unlock.',
+            confirmText: 'Log out',
+            variant: 'danger'
+        })) {
+            return;
+        }
+        lockVault();
+    };
 }
 
 // Track Activity
@@ -1131,6 +1581,10 @@ function updateDockButtonsState() {
     toggleExplorerBtn.classList.toggle('disabled', !hasActiveSession);
     broadcastBtn.classList.toggle('disabled', !hasActiveSession);
     toggleProcessesBtn.classList.toggle('disabled', !hasActiveSession);
+    toggleDockerBtn.classList.toggle('disabled', !hasActiveSession);
+    if (toggleSageBtn) {
+        toggleSageBtn.classList.toggle('disabled', !hasActiveSession || !isSageConfigured());
+    }
 }
 
 function migrateData(data, isRoot = true) {
@@ -1165,7 +1619,80 @@ function migrateData(data, isRoot = true) {
     });
 }
 
+function collectConnectionIds(items, ids = new Set()) {
+    for (const item of items) {
+        if (item?.id) ids.add(item.id);
+        if (item?.children) collectConnectionIds(item.children, ids);
+    }
+    return ids;
+}
+
+function prepareImportedItems(items, existingIds) {
+    const prepared = [];
+
+    for (const item of items) {
+        if (!item || item.id === 'local-terminal') continue;
+
+        const copy = JSON.parse(JSON.stringify(item));
+        copy.id = generateId();
+        existingIds.add(copy.id);
+
+        if (!copy.type) copy.type = 'connection';
+        if (copy.children) {
+            copy.children = prepareImportedItems(copy.children, existingIds);
+        }
+
+        prepared.push(copy);
+    }
+
+    return prepared;
+}
+
+function normalizeImportedData(importedRaw) {
+    if (Array.isArray(importedRaw)) return importedRaw;
+    if (importedRaw?.connections && Array.isArray(importedRaw.connections)) {
+        return importedRaw.connections;
+    }
+    return [];
+}
+
+function mergeImportedConnections(existing, importedRaw) {
+    const importedArray = normalizeImportedData(importedRaw);
+    if (importedArray.length === 0) return existing;
+
+    const existingIds = collectConnectionIds(existing);
+    const prepared = prepareImportedItems(importedArray, existingIds);
+
+    if (prepared.length === 0) return existing;
+
+    const localTerminal = existing.find(item => item.id === 'local-terminal');
+    const rest = existing.filter(item => item.id !== 'local-terminal');
+
+    return localTerminal ? [localTerminal, ...rest, ...prepared] : [...existing, ...prepared];
+}
+
 // Render Tree
+function getListIconHtml(item) {
+    if (item.type === 'folder') {
+        return `<span class="list-folder-glyph" aria-hidden="true">~/</span>`;
+    }
+
+    const proto = item.protocol || 'ssh';
+    const prompts = {
+        ssh: '>_',
+        local: '$_',
+        rdp: '>_',
+        vnc: '>_'
+    };
+    const glyph = prompts[proto] || '>_';
+    return `<span class="list-icon-glyph" aria-hidden="true">${glyph}</span>`;
+}
+
+function getListIconType(item) {
+    if (item.type === 'folder') return 'folder';
+    return item.protocol || 'ssh';
+}
+
 function renderTree(items, container, query = '', parentColor = null) {
     container.innerHTML = '';
 
@@ -1205,15 +1732,15 @@ function renderTree(items, container, query = '', parentColor = null) {
             li.innerHTML = `
         <div class="folder-header">
           <div class="folder-content">
-            <i class="fas fa-chevron-right expansion-icon"></i>
-            <span class="folder-icon">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+            <i class="fas fa-chevron-right list-expander" aria-hidden="true"></i>
+            <span class="list-icon" data-type="folder">
+              ${getListIconHtml(item)}
             </span>
-            <span>${sanitizeHTML(item.label)}</span>
+            <span class="list-label">${sanitizeHTML(item.label)}</span>
           </div>
           <div class="folder-actions-group">
-            <button class="menu-btn add-child-btn" title="Add Connection to Folder">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <button class="list-menu-btn add-child-btn" title="Add Connection to Folder" aria-label="Add connection to folder">
+              <i class="fas fa-plus"></i>
             </button>
           </div>
         </div>
@@ -1234,7 +1761,7 @@ function renderTree(items, container, query = '', parentColor = null) {
 
             // Toggle Expand
             li.querySelector('.folder-header').onclick = (e) => {
-                if (e.target.closest('.menu-btn')) return;
+                if (e.target.closest('.list-menu-btn')) return;
                 item.expanded = !item.expanded;
                 renderTree(connections, connectionListEl); // Re-render to show/hide children
                 ipcRenderer.invoke('save-connections', connections);
@@ -1261,29 +1788,19 @@ function renderTree(items, container, query = '', parentColor = null) {
                 li.style.setProperty('--item-color', connectionColor);
             }
 
-            // Determine Icon based on Protocol
-            let iconSvg = '';
-            const proto = item.protocol || 'ssh';
-
-            if (proto === 'rdp') {
-                iconSvg = '<i class="fas fa-desktop" style="font-size: 14px;"></i>';
-            } else if (proto === 'vnc') {
-                iconSvg = '<i class="fas fa-tv" style="font-size: 14px;"></i>';
-            } else if (proto === 'local') {
-                iconSvg = '<i class="fas fa-terminal" style="font-size: 14px;"></i>';
-            } else {
-                // SSH Default
-                iconSvg = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>';
-            }
+            const iconType = getListIconType(item);
 
             li.innerHTML = `
         <div class="connection-header">
           <div class="connection-label-wrap">
-            <span class="connection-icon">
-              ${iconSvg}
+            <span class="list-icon" data-type="${sanitizeHTML(iconType)}">
+              ${getListIconHtml(item)}
             </span>
-            <span>${sanitizeHTML(item.label)}</span>
+            <span class="list-label">${sanitizeHTML(item.label)}</span>
           </div>
+          <button class="list-menu-btn connection-menu-btn" title="Connection actions" aria-label="Connection actions">
+            <i class="fas fa-ellipsis-v"></i>
+          </button>
         </div>
         <div class="sidebar-metrics" id="metrics-${sanitizeHTML(item.id)}">
           <div class="mini-bar"><div class="mini-bar-fill mini-bar-cpu"></div></div>
@@ -1292,7 +1809,13 @@ function renderTree(items, container, query = '', parentColor = null) {
         </div>
       `;
 
+            li.querySelector('.connection-menu-btn').onclick = (e) => {
+                e.stopPropagation();
+                showActionMenu(e, item.id);
+            };
+
             li.onclick = (e) => {
+                if (e.target.closest('.connection-menu-btn')) return;
                 const sessionItem = { ...item };
                 if (connectionColor) sessionItem.color = connectionColor;
                 createSession(sessionItem);
@@ -1765,6 +2288,8 @@ function activateSession(sessionId) {
         toggleExplorerBtn.classList.remove('disabled');
         broadcastBtn.classList.remove('disabled');
         toggleProcessesBtn.classList.remove('disabled');
+        toggleDockerBtn.classList.toggle('disabled', !isDockerCapableConnection(session.connection));
+        updateDockButtonsState();
 
         // If explorer is open, refresh its content for the new session
         if (!fileExplorer.classList.contains('collapsed')) {
@@ -1782,6 +2307,8 @@ function activateSession(sessionId) {
         toggleExplorerBtn.classList.add('disabled');
         broadcastBtn.classList.add('disabled');
         toggleProcessesBtn.classList.add('disabled');
+        toggleDockerBtn.classList.add('disabled');
+        updateDockButtonsState();
 
         // Deactivate broadcast if it was on
         if (broadcastMode) {
@@ -2129,6 +2656,10 @@ function showActionMenu(e, id) {
     const editBtn = document.getElementById('action-edit');
     const cloneBtn = document.getElementById('action-clone');
     const deleteBtn = document.getElementById('action-delete');
+    const dockerBtn = document.getElementById('action-docker');
+    const item = findItem(connections, actionMenuTargetId);
+    const isFolder = item && item.type === 'folder';
+    const dockerCapable = isDockerCapableConnection(item);
 
     if (isLocalTerminal) {
         editBtn.classList.add('disabled');
@@ -2137,10 +2668,54 @@ function showActionMenu(e, id) {
         editBtn.onclick = null;
         cloneBtn.onclick = null;
         deleteBtn.onclick = null;
+
+        dockerBtn.classList.remove('disabled');
+        dockerBtn.onclick = () => {
+            actionMenu.classList.add('hidden');
+            openDockerExplorer(item);
+        };
+    } else if (isFolder) {
+        editBtn.classList.remove('disabled');
+        cloneBtn.classList.remove('disabled');
+        deleteBtn.classList.remove('disabled');
+        dockerBtn.classList.add('disabled');
+        dockerBtn.onclick = null;
+
+        editBtn.onclick = () => {
+            openModal(actionMenuTargetId, 'folder');
+            actionMenu.classList.add('hidden');
+        };
+
+        cloneBtn.onclick = () => {
+            cloneItem(actionMenuTargetId);
+            actionMenu.classList.add('hidden');
+        };
+
+        deleteBtn.onclick = async () => {
+            actionMenu.classList.add('hidden');
+            if (!await showConfirm({
+                title: 'Delete folder?',
+                message: 'Are you sure you want to delete this folder and all its contents?\n\nThis action cannot be undone.',
+                confirmText: 'Delete',
+                variant: 'danger'
+            })) return;
+            await deleteConnectionById(actionMenuTargetId);
+        };
     } else {
         editBtn.classList.remove('disabled');
         cloneBtn.classList.remove('disabled');
         deleteBtn.classList.remove('disabled');
+
+        if (dockerCapable) {
+            dockerBtn.classList.remove('disabled');
+            dockerBtn.onclick = () => {
+                actionMenu.classList.add('hidden');
+                openDockerExplorer(item);
+            };
+        } else {
+            dockerBtn.classList.add('disabled');
+            dockerBtn.onclick = null;
+        }
 
         editBtn.onclick = () => {
             openModal(actionMenuTargetId);
@@ -2152,19 +2727,18 @@ function showActionMenu(e, id) {
             actionMenu.classList.add('hidden');
         };
 
-        deleteBtn.onclick = () => {
-            const item = findItem(connections, actionMenuTargetId);
-            const isFolder = item && item.type === 'folder';
-            const titleEl = document.getElementById('delete-modal-title');
-            const messageEl = document.getElementById('delete-modal-message');
-
-            if (titleEl) titleEl.innerText = isFolder ? 'Delete Folder?' : 'Delete Connection?';
-            if (messageEl) messageEl.innerText = isFolder
-                ? 'Are you sure you want to delete this folder and all its contents? This action cannot be undone.'
-                : 'Are you sure you want to delete this connection? This action cannot be undone.';
-
-            deleteModal.classList.remove('hidden');
+        deleteBtn.onclick = async () => {
+            const isFolderConn = item && item.type === 'folder';
             actionMenu.classList.add('hidden');
+            if (!await showConfirm({
+                title: isFolderConn ? 'Delete folder?' : 'Delete connection?',
+                message: isFolderConn
+                    ? 'Are you sure you want to delete this folder and all its contents?\n\nThis action cannot be undone.'
+                    : 'Are you sure you want to delete this connection?\n\nThis action cannot be undone.',
+                confirmText: 'Delete',
+                variant: 'danger'
+            })) return;
+            await deleteConnectionById(actionMenuTargetId);
         };
     }
 }
@@ -2218,26 +2792,19 @@ function showTabContextMenu(x, y, sessionId) {
     };
 }
 
-// Delete Logic
-deleteCancelBtn.onclick = () => {
-    deleteModal.classList.add('hidden');
-};
-
-deleteConfirmBtn.onclick = async () => {
-    if (actionMenuTargetId) {
-        const info = findParent(connections, actionMenuTargetId);
-        if (info) {
-            if (info.parent) {
-                info.parent.children = info.parent.children.filter(c => c.id !== actionMenuTargetId);
-            } else {
-                connections = connections.filter(c => c.id !== actionMenuTargetId);
-            }
-            await ipcRenderer.invoke('save-connections', connections);
-            renderTree(connections, connectionListEl);
+async function deleteConnectionById(id) {
+    if (!id) return;
+    const info = findParent(connections, id);
+    if (info) {
+        if (info.parent) {
+            info.parent.children = info.parent.children.filter(c => c.id !== id);
+        } else {
+            connections = connections.filter(c => c.id !== id);
         }
+        await ipcRenderer.invoke('save-connections', connections);
+        renderTree(connections, connectionListEl);
     }
-    deleteModal.classList.add('hidden');
-};
+}
 
 // Modal Logic
 function openModal(id = null, type = 'connection', parentId = null) {
@@ -2313,6 +2880,11 @@ function openModal(id = null, type = 'connection', parentId = null) {
         authFieldsContainer.style.display = isFolder ? 'none' : 'block';
     }
 
+    const sshOptionsGroup = document.getElementById('ssh-options-group');
+    if (sshOptionsGroup) {
+        sshOptionsGroup.style.display = isFolder ? 'none' : 'block';
+    }
+
     const colorGroup = document.getElementById('color-group');
     if (colorGroup) {
         colorGroup.style.display = isFolder ? 'block' : 'none';
@@ -2359,6 +2931,7 @@ function openModal(id = null, type = 'connection', parentId = null) {
             const bKey = document.getElementById('bastion-key-path');
             if (bKey) bKey.value = item.bastionKeyPath || '';
 
+            loadSshOptionsDraft(item.sshOptions);
             updateBastionStatusDot();
             updateAuthFields();
             updateProtocolFields();
@@ -2377,6 +2950,7 @@ function openModal(id = null, type = 'connection', parentId = null) {
 
         currentAuthType = 'password'; // Reset to default
         currentProtocol = 'ssh'; // Reset to default
+        loadSshOptionsDraft([]);
         updateAuthFields();
         updateProtocolFields();
 
@@ -2480,6 +3054,7 @@ saveConnectionBtn.onclick = async () => {
         newItem.bastionHost = document.getElementById('bastion-host').value;
         newItem.bastionUser = document.getElementById('bastion-user').value;
         newItem.bastionKeyPath = document.getElementById('bastion-key-path').value;
+        newItem.sshOptions = getSshOptionsForSave();
     } else if (type === 'folder') {
         newItem.children = editingId ? (findItem(connections, editingId).children || []) : [];
         newItem.expanded = true;
@@ -2820,13 +3395,866 @@ async function loadProcesses() {
             <td><button class="btn-kill" data-pid="${p.pid}">Kill</button></td>
         `;
         tr.querySelector('.btn-kill').onclick = async () => {
-            if (confirm(`Kill process ${p.pid} (${p.comm})?`)) {
+            if (await showConfirm({
+                title: 'Kill process?',
+                message: `Kill process ${p.pid} (${p.comm})?`,
+                confirmText: 'Kill',
+                variant: 'danger'
+            })) {
                 const success = await ipcRenderer.invoke('kill-process', { connection: session.connection, pid: p.pid });
                 if (success) loadProcesses();
             }
         };
         processListBody.appendChild(tr);
     });
+}
+
+function isDockerCapableConnection(connection) {
+    if (!connection || connection.type === 'folder') return false;
+    const proto = connection.protocol || 'ssh';
+    return proto === 'ssh' || proto === 'local';
+}
+
+function setDockerStatus(message, type = 'info', hide = false) {
+    if (hide || !message) {
+        dockerStatusBanner.classList.add('hidden');
+        dockerStatusBanner.textContent = '';
+        return;
+    }
+    dockerStatusBanner.className = `docker-status-banner ${type}`;
+    dockerStatusBanner.textContent = message;
+    dockerStatusBanner.classList.remove('hidden');
+}
+
+function getDockerConnectionLabel(connection) {
+    if (!connection) return '';
+    if (connection.id === 'local-terminal') return 'Local Terminal';
+    const host = connection.host || 'localhost';
+    const port = connection.port ? `:${connection.port}` : '';
+    return `${connection.label} (${connection.user}@${host}${port})`;
+}
+
+function resetDockerViewer() {
+    dockerDetailsPanel.classList.add('hidden');
+    dockerDetailsPanel.innerHTML = '';
+    dockerActionBar.classList.add('hidden');
+    dockerActionBar.innerHTML = '';
+    dockerViewerTitle.textContent = 'Details & Live Logs';
+    dockerClearLogsBtn.classList.add('hidden');
+    dockerToggleFollowBtn.classList.add('hidden');
+    dockerStopLogsBtn.classList.add('hidden');
+    dockerLogsViewer.textContent = '';
+    dockerLogsEmpty.classList.remove('hidden');
+}
+
+async function stopDockerLogStream() {
+    if (dockerLogStreamId) {
+        await ipcRenderer.invoke('docker-logs-stream-stop', { streamId: dockerLogStreamId });
+        dockerLogStreamId = null;
+    }
+}
+
+function closeDockerExplorer() {
+    stopDockerLogStream();
+    ipcRenderer.invoke('docker-logs-stream-stop-all');
+    dockerModal.classList.add('hidden');
+    dockerSelectedItem = null;
+    dockerExplorerConnection = null;
+}
+
+async function openDockerExplorer(connection) {
+    if (!isDockerCapableConnection(connection)) {
+        showNotification('Docker Explorer', 'Docker is only available for SSH and local connections.', 'error');
+        return;
+    }
+
+    dockerExplorerConnection = connection;
+    dockerModalSubtitle.textContent = getDockerConnectionLabel(connection);
+    dockerSearch.value = '';
+    dockerActiveTab = 'containers';
+    dockerSelectedItem = null;
+    dockerContainersCache = null;
+    dockerImagesCache = null;
+    dockerVolumesCache = null;
+    dockerTabLoadedAt = {};
+    document.querySelectorAll('.docker-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'containers'));
+    resetDockerViewer();
+    dockerModal.classList.remove('hidden');
+    await initializeDockerExplorer();
+}
+
+async function initializeDockerExplorer() {
+    if (!dockerExplorerConnection) return;
+
+    dockerResourceList.innerHTML = '<div class="docker-empty-state">Checking Docker...</div>';
+    setDockerStatus('Checking Docker daemon...', 'info');
+
+    try {
+        const available = await ipcRenderer.invoke('docker-check', { connection: dockerExplorerConnection });
+        if (!available) {
+            setDockerStatus('Docker is not available on this host. Install Docker and ensure your user can run docker commands.', 'error');
+            dockerResourceList.innerHTML = '<div class="docker-empty-state">No Docker daemon detected</div>';
+            dockerStatsEl.classList.add('hidden');
+            return;
+        }
+
+        setDockerStatus('', 'info', true);
+        await loadDockerStats();
+        await loadDockerTab('containers');
+    } catch (err) {
+        setDockerStatus(`Failed to connect to Docker: ${err.message || err}`, 'error');
+        dockerResourceList.innerHTML = '<div class="docker-empty-state">Unable to reach Docker</div>';
+    }
+}
+
+async function loadDockerStats() {
+    const stats = await ipcRenderer.invoke('docker-get-stats', { connection: dockerExplorerConnection });
+    dockerStatRunning.textContent = stats.running;
+    dockerStatContainers.textContent = stats.total;
+    dockerStatImages.textContent = stats.images;
+    dockerStatVolumes.textContent = stats.volumes;
+    dockerStatsEl.classList.remove('hidden');
+}
+
+async function refreshDockerView(force = true) {
+    if (!dockerExplorerConnection) return;
+    dockerTabLoadedAt[dockerActiveTab] = 0;
+    await loadDockerStats();
+    await loadDockerTab(dockerActiveTab, force);
+    if (dockerSelectedItem) {
+        await showDockerSelection(dockerSelectedItem, false);
+    }
+}
+
+async function loadDockerTab(tab, force = false) {
+    if (!dockerExplorerConnection) return;
+
+    const now = Date.now();
+    if (!force && dockerTabLoadedAt[tab] && (now - dockerTabLoadedAt[tab]) < DOCKER_CACHE_TTL_MS) {
+        renderDockerResourceList();
+        return;
+    }
+
+    dockerResourceList.innerHTML = '<div class="docker-empty-state"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+
+    try {
+        if (tab === 'containers') {
+            dockerContainersCache = await ipcRenderer.invoke('docker-list-containers', { connection: dockerExplorerConnection });
+        } else if (tab === 'images') {
+            dockerImagesCache = await ipcRenderer.invoke('docker-list-images', { connection: dockerExplorerConnection });
+        } else if (tab === 'volumes') {
+            dockerVolumesCache = await ipcRenderer.invoke('docker-list-volumes', { connection: dockerExplorerConnection });
+        }
+        dockerTabLoadedAt[tab] = now;
+        renderDockerResourceList();
+    } catch (err) {
+        dockerResourceList.innerHTML = `<div class="docker-empty-state">Failed to load ${tab}</div>`;
+        setDockerStatus(`Failed to load ${tab}: ${err.message || err}`, 'error');
+    }
+}
+
+function getDockerCacheForTab(tab) {
+    if (tab === 'containers') return dockerContainersCache || [];
+    if (tab === 'images') return dockerImagesCache || [];
+    if (tab === 'volumes') return dockerVolumesCache || [];
+    return [];
+}
+
+function renderDockerResourceList() {
+    const query = dockerSearch.value.trim().toLowerCase();
+    const items = getDockerCacheForTab(dockerActiveTab);
+    dockerResourceList.innerHTML = '';
+
+    const filtered = items.filter(item => {
+        const haystack = JSON.stringify(item).toLowerCase();
+        return !query || haystack.includes(query);
+    });
+
+    if (filtered.length === 0) {
+        dockerResourceList.innerHTML = `<div class="docker-empty-state">No ${dockerActiveTab} found</div>`;
+        return;
+    }
+
+    filtered.forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'docker-resource-item';
+        if (dockerSelectedItem && dockerSelectedItem.ref === getDockerItemRef(item, dockerActiveTab)) {
+            el.classList.add('active');
+        }
+
+        if (dockerActiveTab === 'containers') {
+            const isRunning = (item.state || '').toLowerCase().includes('running');
+            el.innerHTML = `
+                <div class="docker-resource-icon container"><i class="fas fa-box"></i></div>
+                <div class="docker-resource-info">
+                    <div class="docker-resource-name">${sanitizeHTML(item.name || item.id)}</div>
+                    <div class="docker-resource-meta">${sanitizeHTML(item.image)} · ${sanitizeHTML(item.runningFor || item.status)}</div>
+                </div>
+                <span class="docker-state ${isRunning ? 'running' : 'stopped'}">${isRunning ? 'running' : item.state || 'stopped'}</span>
+            `;
+        } else if (dockerActiveTab === 'images') {
+            el.innerHTML = `
+                <div class="docker-resource-icon image"><i class="fas fa-layer-group"></i></div>
+                <div class="docker-resource-info">
+                    <div class="docker-resource-name">${sanitizeHTML(item.repository)}:${sanitizeHTML(item.tag)}</div>
+                    <div class="docker-resource-meta">${sanitizeHTML(item.size)} · ${sanitizeHTML(item.created)}</div>
+                </div>
+                <span class="docker-resource-id">${sanitizeHTML(item.id.slice(0, 12))}</span>
+            `;
+        } else {
+            el.innerHTML = `
+                <div class="docker-resource-icon volume"><i class="fas fa-database"></i></div>
+                <div class="docker-resource-info">
+                    <div class="docker-resource-name">${sanitizeHTML(item.name)}</div>
+                    <div class="docker-resource-meta">Driver: ${sanitizeHTML(item.driver)}</div>
+                </div>
+            `;
+        }
+
+        el.onclick = () => {
+            document.querySelectorAll('.docker-resource-item').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+            const selection = {
+                type: dockerActiveTab === 'containers' ? 'container' : dockerActiveTab === 'images' ? 'image' : 'volume',
+                ref: getDockerItemRef(item, dockerActiveTab),
+                data: item
+            };
+            showDockerSelection(selection);
+        };
+
+        dockerResourceList.appendChild(el);
+    });
+}
+
+function getDockerItemRef(item, tab) {
+    if (tab === 'containers') return item.name || item.id;
+    if (tab === 'images') return item.id;
+    return item.name;
+}
+
+function getDockerImageRef(item) {
+    if (item.tag && item.tag !== '<none>') return `${item.repository}:${item.tag}`;
+    return item.id;
+}
+
+async function showDockerSelection(selection, startLogs = true) {
+    dockerSelectedItem = selection;
+    dockerViewerTitle.textContent = selection.data.name || selection.data.repository || selection.ref;
+    renderDockerActionBar(selection);
+    await renderDockerDetails(selection);
+
+    if (selection.type === 'container' && startLogs) {
+        await startDockerLogStream(selection.ref, selection.data.name || selection.ref);
+    } else {
+        stopDockerLogStream();
+        dockerClearLogsBtn.classList.add('hidden');
+        dockerToggleFollowBtn.classList.add('hidden');
+        dockerStopLogsBtn.classList.add('hidden');
+        dockerLogsViewer.textContent = '';
+        dockerLogsEmpty.textContent = selection.type === 'container'
+            ? 'Select a container to stream live logs'
+            : 'Live logs are available for containers only';
+        dockerLogsEmpty.classList.remove('hidden');
+    }
+}
+
+function renderDockerActionBar(selection) {
+    dockerActionBar.innerHTML = '';
+    dockerActionBar.classList.remove('hidden');
+
+    const primary = document.createElement('div');
+    primary.className = 'docker-action-group';
+    const utility = document.createElement('div');
+    utility.className = 'docker-action-group';
+    const danger = document.createElement('div');
+    danger.className = 'docker-action-group docker-action-danger';
+
+    const addAction = (group, label, className, onClick, isDanger = false) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `btn-docker-action ${className}${isDanger ? ' danger' : ''}`;
+        btn.textContent = label;
+        btn.onclick = onClick;
+        group.appendChild(btn);
+    };
+
+    if (selection.type === 'container') {
+        const state = (selection.data.state || '').toLowerCase();
+        const isRunning = state === 'running';
+        const isPaused = state === 'paused';
+        const ref = selection.ref;
+
+        if (!isRunning && !isPaused) {
+            addAction(primary, 'Start', 'start', () => runDockerContainerAction(ref, 'start'));
+        } else if (isPaused) {
+            addAction(primary, 'Unpause', 'unpause', () => runDockerContainerAction(ref, 'unpause'));
+        } else {
+            addAction(primary, 'Stop', 'stop', () => runDockerContainerAction(ref, 'stop'));
+            addAction(primary, 'Restart', 'restart', () => runDockerContainerAction(ref, 'restart'));
+            addAction(primary, 'Pause', 'pause', () => runDockerContainerAction(ref, 'pause'));
+            addAction(danger, 'Kill', 'kill', () => runDockerContainerAction(ref, 'kill', true), true);
+        }
+        addAction(utility, 'Inspect', 'inspect', () => inspectDockerResource('container', ref));
+        addAction(danger, 'Remove', 'remove', () => runDockerContainerAction(ref, 'rm', true), true);
+    } else if (selection.type === 'image') {
+        const ref = getDockerImageRef(selection.data);
+        addAction(utility, 'Inspect', 'inspect', () => inspectDockerResource('image', ref));
+        addAction(danger, 'Remove', 'remove', () => runDockerImageAction(ref), true);
+    } else if (selection.type === 'volume') {
+        addAction(utility, 'Inspect', 'inspect', () => inspectDockerResource('volume', selection.ref));
+        addAction(danger, 'Remove', 'remove', () => runDockerVolumeAction(selection.ref), true);
+    }
+
+    if (primary.children.length) dockerActionBar.appendChild(primary);
+    if (utility.children.length) dockerActionBar.appendChild(utility);
+    if (danger.children.length) dockerActionBar.appendChild(danger);
+}
+
+async function renderDockerDetails(selection) {
+    dockerDetailsPanel.classList.remove('hidden');
+    dockerDetailsPanel.innerHTML = '<div class="docker-details-loading"><i class="fas fa-spinner fa-spin"></i> Loading details...</div>';
+
+    const item = selection.data;
+    let html = '<div class="docker-details-grid">';
+
+    if (selection.type === 'container') {
+        const isRunning = (item.state || '').toLowerCase().includes('running');
+        html += buildDetailRow('Name', item.name);
+        html += buildDetailRow('ID', item.id);
+        html += buildDetailRow('Image', item.image);
+        html += buildDetailRow('Status', item.status);
+        html += buildDetailRow('State', item.state, isRunning ? 'running' : 'stopped');
+        html += buildDetailRow('Uptime', item.runningFor || '—');
+        html += buildDetailRow('Size', item.size || '—');
+        html += buildDetailRow('Ports', item.ports || '—');
+    } else if (selection.type === 'image') {
+        html += buildDetailRow('Repository', item.repository);
+        html += buildDetailRow('Tag', item.tag);
+        html += buildDetailRow('ID', item.id);
+        html += buildDetailRow('Size', item.size);
+        html += buildDetailRow('Created', item.created);
+    } else {
+        html += buildDetailRow('Name', item.name);
+        html += buildDetailRow('Driver', item.driver);
+    }
+
+    html += '</div>';
+    dockerDetailsPanel.innerHTML = html;
+}
+
+function buildDetailRow(label, value, stateClass = '') {
+    const valueHtml = stateClass
+        ? `<span class="docker-state ${stateClass}">${sanitizeHTML(String(value))}</span>`
+        : sanitizeHTML(String(value || '—'));
+    return `<div class="docker-detail-row"><span class="docker-detail-label">${label}</span><span class="docker-detail-value">${valueHtml}</span></div>`;
+}
+
+async function inspectDockerResource(resourceType, resourceRef) {
+    const result = await ipcRenderer.invoke('docker-inspect', {
+        connection: dockerExplorerConnection,
+        resourceType,
+        resourceRef
+    });
+
+    if (!result.success) {
+        showNotification('Inspect Failed', result.error || 'Could not inspect resource.', 'error');
+        return;
+    }
+
+    dockerDetailsPanel.innerHTML = `
+        <div class="docker-inspect-header">
+            <span><i class="fas fa-code"></i> Inspect — ${sanitizeHTML(resourceRef)}</span>
+            <button type="button" class="btn-docker-action" id="docker-inspect-back">Back to summary</button>
+        </div>
+        <pre class="docker-inspect-json">${sanitizeHTML(JSON.stringify(result.data, null, 2))}</pre>
+    `;
+    document.getElementById('docker-inspect-back').onclick = () => {
+        if (dockerSelectedItem) renderDockerDetails(dockerSelectedItem);
+    };
+}
+
+async function runDockerContainerAction(containerRef, action, needsConfirm = false) {
+    if (!dockerExplorerConnection) return;
+    const labels = { start: 'Start', stop: 'Stop', restart: 'Restart', rm: 'Remove', kill: 'Kill', pause: 'Pause', unpause: 'Unpause' };
+    if (needsConfirm && !await showConfirm({
+        title: `${labels[action] || action} container?`,
+        message: `${labels[action] || action} container "${containerRef}"?`,
+        confirmText: labels[action] || 'Confirm',
+        variant: action === 'rm' || action === 'kill' ? 'danger' : 'primary'
+    })) return;
+
+    const result = await ipcRenderer.invoke('docker-container-action', {
+        connection: dockerExplorerConnection,
+        containerRef,
+        action
+    });
+
+    if (result.success) {
+        showNotification('Docker', `Container ${labels[action] || action} successful.`, 'success');
+        dockerTabLoadedAt.containers = 0;
+        await loadDockerStats();
+        await loadDockerTab('containers', true);
+        if (dockerSelectedItem && dockerSelectedItem.ref === containerRef) {
+            const updated = (dockerContainersCache || []).find(c => (c.name || c.id) === containerRef);
+            if (updated) {
+                dockerSelectedItem.data = updated;
+                await showDockerSelection(dockerSelectedItem, action !== 'rm');
+            } else if (action === 'rm') {
+                dockerSelectedItem = null;
+                resetDockerViewer();
+            }
+        }
+    } else {
+        showNotification('Docker Error', result.error || 'Action failed.', 'error');
+    }
+}
+
+async function runDockerImageAction(imageRef) {
+    if (!await showConfirm({
+        title: 'Remove image?',
+        message: `Remove image "${imageRef}"?`,
+        confirmText: 'Remove',
+        variant: 'danger'
+    })) return;
+    const result = await ipcRenderer.invoke('docker-image-action', {
+        connection: dockerExplorerConnection,
+        imageRef,
+        action: 'rm'
+    });
+    if (result.success) {
+        showNotification('Docker', 'Image removed successfully.', 'success');
+        dockerTabLoadedAt.images = 0;
+        await loadDockerStats();
+        await loadDockerTab('images', true);
+        dockerSelectedItem = null;
+        resetDockerViewer();
+    } else {
+        showNotification('Docker Error', result.error || 'Failed to remove image.', 'error');
+    }
+}
+
+async function runDockerVolumeAction(volumeName) {
+    if (!await showConfirm({
+        title: 'Remove volume?',
+        message: `Remove volume "${volumeName}"?`,
+        confirmText: 'Remove',
+        variant: 'danger'
+    })) return;
+    const result = await ipcRenderer.invoke('docker-volume-action', {
+        connection: dockerExplorerConnection,
+        volumeName,
+        action: 'rm'
+    });
+    if (result.success) {
+        showNotification('Docker', 'Volume removed successfully.', 'success');
+        dockerTabLoadedAt.volumes = 0;
+        await loadDockerStats();
+        await loadDockerTab('volumes', true);
+        dockerSelectedItem = null;
+        resetDockerViewer();
+    } else {
+        showNotification('Docker Error', result.error || 'Failed to remove volume.', 'error');
+    }
+}
+
+async function startDockerLogStream(containerRef, displayName) {
+    await stopDockerLogStream();
+    dockerLogsViewer.textContent = '';
+    dockerLogsEmpty.classList.add('hidden');
+    dockerClearLogsBtn.classList.remove('hidden');
+    dockerToggleFollowBtn.classList.remove('hidden');
+    dockerStopLogsBtn.classList.remove('hidden');
+    dockerViewerTitle.textContent = `Live logs — ${displayName}`;
+
+    const result = await ipcRenderer.invoke('docker-logs-stream-start', {
+        connection: dockerExplorerConnection,
+        containerRef,
+        tail: 200
+    });
+
+    if (result.success) {
+        dockerLogStreamId = result.streamId;
+    } else {
+        dockerLogsViewer.textContent = result.error || 'Failed to start log stream.';
+        showNotification('Docker Logs', result.error || 'Failed to start stream.', 'error');
+    }
+}
+
+async function loadSageConfig() {
+    try {
+        const loaded = await ipcRenderer.invoke('load-sage-config');
+        if (loaded) {
+            sageConfig = { ...sageConfig, ...loaded };
+            sageConfig.provider = normalizeSageProvider(sageConfig.provider);
+        }
+    } catch (err) {
+        console.error('Failed to load Sage config:', err);
+    }
+    updateSagePanelState();
+}
+
+function isSageConfigured() {
+    if (!sageConfig.enabled || !sageConfig.apiKey) return false;
+    const meta = getSageProviderMeta(sageConfig.provider);
+    if (meta.requiresBaseUrl && !(sageConfig.baseUrl || '').trim()) return false;
+    return true;
+}
+
+function updateSagePanelState() {
+    if (!sageNotConfigured || !sagePanelBody) return;
+    const configured = isSageConfigured();
+    sageNotConfigured.classList.toggle('hidden', configured);
+    sagePanelBody.classList.toggle('hidden', !configured);
+}
+
+function getActiveSessionConnection() {
+    if (!activeSessionId || !sessions[activeSessionId]) return null;
+    return sessions[activeSessionId].connection;
+}
+
+function getConnectionContextHeader(connection) {
+    if (!connection) return 'No active session';
+    if (connection.id === 'local-terminal') return 'Local Terminal';
+    const host = connection.host || 'localhost';
+    const port = connection.port ? `:${connection.port}` : '';
+    return `${connection.label} · ${connection.user}@${host}${port}`;
+}
+
+function toggleSagePanel(forceOpen = false) {
+    if (!sagePanel) return;
+    const shouldOpen = forceOpen || sagePanel.classList.contains('hidden');
+    if (shouldOpen) {
+        openSagePanel();
+    } else {
+        closeSagePanel();
+    }
+}
+
+function openSagePanel() {
+    if (!sagePanel) return;
+    sagePanel.classList.remove('hidden');
+    document.body.classList.add('sage-panel-open');
+    updateSagePanelState();
+    const connection = getActiveSessionConnection();
+    if (sageConnectionBadge) {
+        sageConnectionBadge.textContent = getConnectionContextHeader(connection);
+    }
+    if (toggleSageBtn) toggleSageBtn.classList.add('active');
+    if (sageInput) sageInput.focus();
+}
+
+function closeSagePanel() {
+    if (!sagePanel) return;
+    sagePanel.classList.add('hidden');
+    document.body.classList.remove('sage-panel-open');
+    if (toggleSageBtn) toggleSageBtn.classList.remove('active');
+}
+
+function clearSageChat() {
+    sageChatHistory = [];
+    sagePendingContext = '';
+    if (sageContextPreview) {
+        sageContextPreview.classList.add('hidden');
+        sageContextPreview.textContent = '';
+    }
+    if (sageMessages) {
+        sageMessages.innerHTML = `
+            <div class="sage-welcome">
+                <p>Ask Sage to explain errors, suggest commands, or diagnose your server.</p>
+                <p class="sage-welcome-hint">Use <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd> to open anytime.</p>
+            </div>
+        `;
+    }
+}
+
+function setSageContextPreview(text) {
+    if (!sageContextPreview) return;
+    if (!text || !text.trim()) {
+        sageContextPreview.classList.add('hidden');
+        sageContextPreview.textContent = '';
+        return;
+    }
+    const preview = text.length > 280 ? `${text.slice(0, 280)}…` : text;
+    sageContextPreview.textContent = preview;
+    sageContextPreview.classList.remove('hidden');
+}
+
+function attachSageSelection() {
+    if (!activeSessionId || !sessions[activeSessionId]) {
+        showNotification('OWL Sage', 'No active terminal session.', 'error');
+        return;
+    }
+    const selection = sessions[activeSessionId].term.getSelection();
+    if (!selection || !selection.trim()) {
+        showNotification('OWL Sage', 'Select text in the terminal first.', 'info');
+        return;
+    }
+    sagePendingContext = `Terminal selection:\n${selection}`;
+    setSageContextPreview(sagePendingContext);
+    showNotification('OWL Sage', 'Selection attached to next message.', 'success');
+}
+
+function attachSageTerminalContext() {
+    if (!activeSessionId || !sessions[activeSessionId]) {
+        showNotification('OWL Sage', 'No active terminal session.', 'error');
+        return;
+    }
+    const recent = sessions[activeSessionId].term.getRecentLines
+        ? sessions[activeSessionId].term.getRecentLines(100)
+        : '';
+    if (!recent || !recent.trim()) {
+        showNotification('OWL Sage', 'Terminal buffer is empty.', 'info');
+        return;
+    }
+    sagePendingContext = `Recent terminal output (last 100 lines):\n${recent}`;
+    setSageContextPreview(sagePendingContext);
+    showNotification('OWL Sage', 'Terminal context attached.', 'success');
+}
+
+async function attachSageDiagnoseContext() {
+    const connection = getActiveSessionConnection();
+    if (!connection) {
+        showNotification('OWL Sage', 'No active session to diagnose.', 'error');
+        return;
+    }
+
+    if (sageBtnDiagnose) {
+        sageBtnDiagnose.disabled = true;
+        sageBtnDiagnose.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Diagnosing';
+    }
+
+    try {
+        sagePendingContext = await buildSageDiagnoseContext(connection);
+        setSageContextPreview(sagePendingContext);
+        showNotification('OWL Sage', 'Diagnose snapshot attached.', 'success');
+    } catch (err) {
+        showNotification('OWL Sage', `Diagnose failed: ${err.message || err}`, 'error');
+    } finally {
+        if (sageBtnDiagnose) {
+            sageBtnDiagnose.disabled = false;
+            sageBtnDiagnose.innerHTML = '<i class="fas fa-stethoscope"></i> Diagnose';
+        }
+    }
+}
+
+async function buildSageDiagnoseContext(connection) {
+    const parts = [`Connection: ${getConnectionContextHeader(connection)}`];
+
+    try {
+        const metrics = await ipcRenderer.invoke('get-metrics', { connection });
+        parts.push([
+            `OS: ${metrics.os}`,
+            `Uptime: ${metrics.uptime}`,
+            `CPU: ${metrics.cpu.toFixed(1)}%`,
+            `RAM: ${metrics.ram.toFixed(1)}%`,
+            `Disk: ${metrics.disk}%`
+        ].join('\n'));
+    } catch (err) {
+        parts.push(`Metrics unavailable: ${err.message || err}`);
+    }
+
+    try {
+        const processes = await ipcRenderer.invoke('get-processes', { connection });
+        const top = processes.slice(0, 12).map(p =>
+            `${p.pid}\t${p.user}\t${p.cpu}%\t${p.mem}%\t${p.comm}`
+        ).join('\n');
+        parts.push(`Top processes (PID USER CPU MEM COMMAND):\n${top}`);
+    } catch (err) {
+        parts.push(`Process list unavailable: ${err.message || err}`);
+    }
+
+    if (isDockerCapableConnection(connection)) {
+        try {
+            const available = await ipcRenderer.invoke('docker-check', { connection });
+            if (available) {
+                const stats = await ipcRenderer.invoke('docker-get-stats', { connection });
+                const containers = await ipcRenderer.invoke('docker-list-containers', { connection });
+                parts.push(`Docker: ${stats.running} running / ${stats.total} total containers, ${stats.images} images`);
+                const lines = containers.slice(0, 15).map(c =>
+                    `${c.name || c.id}\t${c.state}\t${c.image}\t${c.status || ''}`
+                ).join('\n');
+                if (lines) parts.push(`Containers:\n${lines}`);
+            } else {
+                parts.push('Docker: not available on this host');
+            }
+        } catch (err) {
+            parts.push(`Docker info unavailable: ${err.message || err}`);
+        }
+    }
+
+    if (activeSessionId && sessions[activeSessionId]?.term?.getRecentLines) {
+        const recent = sessions[activeSessionId].term.getRecentLines(40);
+        if (recent && recent.trim()) {
+            parts.push(`Recent terminal output:\n${recent}`);
+        }
+    }
+
+    return parts.join('\n\n');
+}
+
+function renderSageMessage(role, content, isStreaming = false) {
+    const welcome = sageMessages.querySelector('.sage-welcome');
+    if (welcome) welcome.remove();
+
+    const el = document.createElement('div');
+    el.className = `sage-message sage-message-${role}${isStreaming ? ' streaming' : ''}`;
+    el.innerHTML = formatSageContent(content);
+    sageMessages.appendChild(el);
+    sageMessages.scrollTop = sageMessages.scrollHeight;
+    return el;
+}
+
+function formatSageContent(content) {
+    if (!content) return '';
+    const parts = [];
+    const codeRegex = /```(\w*)\n([\s\S]*?)```/g;
+    let lastIndex = 0;
+    let match;
+
+    while ((match = codeRegex.exec(content)) !== null) {
+        const before = content.slice(lastIndex, match.index);
+        if (before) {
+            parts.push(sanitizeHTML(before).replace(/\n/g, '<br>'));
+        }
+        const code = match[2].trim();
+        parts.push(`<div class="sage-code-block"><pre><code>${sanitizeHTML(code)}</code></pre>
+            <div class="sage-code-actions">
+                <button type="button" class="sage-code-btn copy">Copy</button>
+                <button type="button" class="sage-code-btn run">Run</button>
+            </div></div>`);
+        lastIndex = codeRegex.lastIndex;
+    }
+
+    const tail = content.slice(lastIndex);
+    if (tail) {
+        parts.push(sanitizeHTML(tail).replace(/\n/g, '<br>'));
+    }
+
+    return parts.join('');
+}
+
+function bindSageCodeActions(container) {
+    container.querySelectorAll('.sage-code-block').forEach(block => {
+        const codeEl = block.querySelector('code');
+        const cmd = codeEl ? codeEl.textContent : '';
+        const copyBtn = block.querySelector('.sage-code-btn.copy');
+        const runBtn = block.querySelector('.sage-code-btn.run');
+        if (copyBtn) {
+            copyBtn.onclick = () => {
+                navigator.clipboard.writeText(cmd);
+                showNotification('OWL Sage', 'Command copied.', 'success', 2000);
+            };
+        }
+        if (runBtn) {
+            runBtn.onclick = async () => {
+                if (!cmd) return;
+                if (!await showConfirm({
+                    title: 'Run command?',
+                    message: `Run this command in the active terminal?\n\n${cmd}`,
+                    confirmText: 'Run',
+                    variant: 'primary'
+                })) return;
+                runSageCommand(cmd);
+            };
+        }
+    });
+}
+
+function runSageCommand(command) {
+    if (!activeSessionId || !sessions[activeSessionId]?.pid) {
+        showNotification('OWL Sage', 'No active terminal to run command.', 'error');
+        return;
+    }
+    const data = command.endsWith('\n') ? command : `${command}\n`;
+    ipcRenderer.send('terminal-write', { pid: sessions[activeSessionId].pid, data });
+    showNotification('OWL Sage', 'Command sent to terminal.', 'success', 2000);
+}
+
+async function sendSageMessage() {
+    if (!isSageConfigured()) {
+        showNotification('OWL Sage', 'Configure an AI provider in Settings first.', 'error');
+        return;
+    }
+    if (sageIsStreaming) return;
+
+    const text = sageInput.value.trim();
+    if (!text) return;
+
+    sageInput.value = '';
+    renderSageMessage('user', text);
+    sageChatHistory.push({ role: 'user', content: text });
+
+    const contextParts = [];
+    if (sagePendingContext) {
+        contextParts.push(sagePendingContext);
+        sagePendingContext = '';
+        setSageContextPreview('');
+    } else if (sageChatHistory.length === 1) {
+        const connection = getActiveSessionConnection();
+        if (connection) {
+            contextParts.push(`Active connection: ${getConnectionContextHeader(connection)}`);
+        }
+    }
+
+    const assistantEl = renderSageMessage('assistant', '', true);
+    sageIsStreaming = true;
+    if (sageStopBtn) sageStopBtn.classList.remove('hidden');
+    if (sageSendBtn) sageSendBtn.disabled = true;
+
+    const result = await ipcRenderer.invoke('sage-chat-stream-start', {
+        messages: sageChatHistory,
+        context: contextParts.join('\n\n')
+    });
+
+    if (!result.success) {
+        finishSageStream(result.error);
+        assistantEl.remove();
+        return;
+    }
+
+    sageStreamId = result.streamId;
+    assistantEl.dataset.streamId = result.streamId;
+}
+
+function appendSageStreamChunk(chunk) {
+    const streamingEl = sageMessages.querySelector('.sage-message-assistant.streaming');
+    if (!streamingEl) return;
+
+    const currentText = streamingEl.dataset.rawText || '';
+    const nextText = currentText + chunk;
+    streamingEl.dataset.rawText = nextText;
+    streamingEl.innerHTML = formatSageContent(nextText);
+    bindSageCodeActions(streamingEl);
+    sageMessages.scrollTop = sageMessages.scrollHeight;
+}
+
+function finishSageStream(error = null) {
+    const streamingEl = sageMessages.querySelector('.sage-message-assistant.streaming');
+    if (streamingEl) {
+        streamingEl.classList.remove('streaming');
+        const content = error
+            ? `Error: ${error}`
+            : (streamingEl.dataset.rawText || '');
+        if (error) {
+            streamingEl.innerHTML = `<span class="sage-error">${sanitizeHTML(error)}</span>`;
+        } else {
+            streamingEl.innerHTML = formatSageContent(content);
+            bindSageCodeActions(streamingEl);
+            sageChatHistory.push({ role: 'assistant', content });
+        }
+    }
+
+    sageStreamId = null;
+    sageIsStreaming = false;
+    if (sageStopBtn) sageStopBtn.classList.add('hidden');
+    if (sageSendBtn) sageSendBtn.disabled = false;
+}
+
+async function stopSageStream() {
+    if (sageStreamId) {
+        await ipcRenderer.invoke('sage-chat-stream-stop', { streamId: sageStreamId });
+    }
+    finishSageStream('Generation stopped.');
 }
 
 function fitActiveTerminal() {
@@ -2837,8 +4265,6 @@ function fitActiveTerminal() {
         }
     }
 }
-
-init();
 
 
 // Resizable Sidebar
@@ -3182,13 +4608,17 @@ function updateProtocolFields() {
     // Adjust fields based on protocol
     const portInput = document.getElementById('port');
     const keyAuthOption = document.querySelector('.auth-option[data-value="key"]');
+    const sshOptionsGroup = document.getElementById('ssh-options-group');
+    const isFolder = connectionForm?.dataset?.type === 'folder';
 
     if (protocol === 'ssh') {
         if (portInput.value === '3389' || portInput.value === '5900') portInput.value = '22';
         if (keyAuthOption) keyAuthOption.style.display = 'flex';
+        if (sshOptionsGroup) sshOptionsGroup.style.display = isFolder ? 'none' : 'block';
     } else if (protocol === 'rdp') {
         if (portInput.value === '22' || portInput.value === '5900') portInput.value = '3389';
         if (keyAuthOption) keyAuthOption.style.display = 'none';
+        if (sshOptionsGroup) sshOptionsGroup.style.display = 'none';
         // Force password auth if switching to RDP
         if (currentAuthType === 'key') {
             document.querySelector('.auth-option[data-value="password"]').click();
@@ -3196,6 +4626,7 @@ function updateProtocolFields() {
     } else if (protocol === 'vnc') {
         if (portInput.value === '22' || portInput.value === '3389') portInput.value = '5900';
         if (keyAuthOption) keyAuthOption.style.display = 'none';
+        if (sshOptionsGroup) sshOptionsGroup.style.display = 'none';
         if (currentAuthType === 'key') {
             document.querySelector('.auth-option[data-value="password"]').click();
         }
@@ -3209,6 +4640,209 @@ document.querySelectorAll('.protocol-option').forEach(opt => {
         updateProtocolFields();
     });
 });
+
+// --- Advanced SSH Options ---
+
+function isValidSshOptionKey(key) {
+    return /^[A-Za-z][A-Za-z0-9]*$/.test(key || '');
+}
+
+function isValidSshOptionValue(value) {
+    return typeof value === 'string' && value.length > 0 && value.length < 256 && !/[\r\n\0]/.test(value);
+}
+
+function createDefaultSshOptionsDraft() {
+    return SSH_OPTION_PRESETS.map((preset) => ({
+        id: `preset:${preset.key}`,
+        key: preset.key,
+        value: preset.value,
+        description: preset.description,
+        enabled: false,
+        preset: true
+    }));
+}
+
+function loadSshOptionsDraft(savedOptions = []) {
+    const draft = createDefaultSshOptionsDraft();
+    const saved = Array.isArray(savedOptions) ? savedOptions : [];
+
+    for (const savedOpt of saved) {
+        if (!savedOpt || !savedOpt.key) continue;
+        const key = String(savedOpt.key).trim();
+        const value = String(savedOpt.value ?? '').trim();
+        const enabled = !!savedOpt.enabled;
+        const presetIdx = draft.findIndex(opt => opt.key === key);
+
+        if (presetIdx >= 0) {
+            draft[presetIdx] = {
+                ...draft[presetIdx],
+                value: value || draft[presetIdx].value,
+                enabled
+            };
+        } else if (isValidSshOptionKey(key)) {
+            draft.push({
+                id: savedOpt.id || `custom:${key}:${generateId()}`,
+                key,
+                value,
+                description: 'Custom OpenSSH option',
+                enabled,
+                preset: false
+            });
+        }
+    }
+
+    sshOptionsDraft = draft;
+    setSshAdvExpanded(false);
+    renderSshOptionsList();
+    updateSshAdvCount();
+}
+
+function getSshOptionsForSave() {
+    return sshOptionsDraft
+        .filter(opt => opt.preset || opt.enabled || (opt.value && opt.value.trim()))
+        .map(opt => ({
+            id: opt.id,
+            key: opt.key,
+            value: String(opt.value ?? '').trim(),
+            enabled: !!opt.enabled,
+            preset: !!opt.preset
+        }))
+        .filter(opt => isValidSshOptionKey(opt.key));
+}
+
+function setSshAdvExpanded(expanded) {
+    const root = document.getElementById('ssh-adv');
+    const body = document.getElementById('ssh-adv-body');
+    const toggle = document.getElementById('ssh-adv-toggle');
+    if (!root || !body || !toggle) return;
+    root.classList.toggle('is-open', expanded);
+    body.classList.toggle('hidden', !expanded);
+    toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+}
+
+function updateSshAdvCount() {
+    const countEl = document.getElementById('ssh-adv-count');
+    if (!countEl) return;
+    const active = sshOptionsDraft.filter(opt => opt.enabled).length;
+    countEl.textContent = active === 1 ? '1 active' : `${active} active`;
+    countEl.classList.toggle('has-active', active > 0);
+}
+
+function renderSshOptionsList() {
+    const list = document.getElementById('ssh-adv-list');
+    if (!list) return;
+    list.innerHTML = '';
+
+    sshOptionsDraft.forEach((opt, index) => {
+        const row = document.createElement('div');
+        row.className = `ssh-adv-row${opt.enabled ? ' is-enabled' : ''}`;
+        row.dataset.index = String(index);
+
+        row.innerHTML = `
+            <div class="ssh-adv-row-main">
+                <div class="ssh-adv-meta">
+                    <span class="ssh-adv-key">${sanitizeHTML(opt.key)}</span>
+                    <span class="ssh-adv-desc">${sanitizeHTML(opt.description || (opt.preset ? '' : 'Custom OpenSSH option'))}</span>
+                </div>
+                <div class="ssh-adv-controls">
+                    <input type="text" class="ssh-adv-value" value="${sanitizeHTML(opt.value || '')}" spellcheck="false" ${opt.enabled ? '' : 'disabled'}>
+                    <label class="ssh-adv-switch" title="${opt.enabled ? 'Disable' : 'Enable'}">
+                        <input type="checkbox" class="ssh-adv-enable" ${opt.enabled ? 'checked' : ''}>
+                        <span class="ssh-adv-switch-ui"></span>
+                    </label>
+                    ${opt.preset ? '' : '<button type="button" class="ssh-adv-remove" title="Remove option"><i class="fas fa-times"></i></button>'}
+                </div>
+            </div>
+        `;
+
+        const valueInput = row.querySelector('.ssh-adv-value');
+        const enableInput = row.querySelector('.ssh-adv-enable');
+        const removeBtn = row.querySelector('.ssh-adv-remove');
+
+        valueInput.addEventListener('input', () => {
+            sshOptionsDraft[index].value = valueInput.value;
+        });
+
+        enableInput.addEventListener('change', () => {
+            sshOptionsDraft[index].enabled = enableInput.checked;
+            valueInput.disabled = !enableInput.checked;
+            row.classList.toggle('is-enabled', enableInput.checked);
+            updateSshAdvCount();
+        });
+
+        if (removeBtn) {
+            removeBtn.addEventListener('click', () => {
+                sshOptionsDraft.splice(index, 1);
+                renderSshOptionsList();
+                updateSshAdvCount();
+            });
+        }
+
+        list.appendChild(row);
+    });
+}
+
+function addCustomSshOption() {
+    const keyInput = document.getElementById('ssh-adv-custom-key');
+    const valueInput = document.getElementById('ssh-adv-custom-value');
+    if (!keyInput || !valueInput) return;
+
+    const key = keyInput.value.trim();
+    const value = valueInput.value.trim();
+
+    if (!isValidSshOptionKey(key)) {
+        showNotification('SSH Options', 'Option name must be letters/numbers only (e.g. ServerAliveInterval).', 'error');
+        return;
+    }
+    if (!isValidSshOptionValue(value)) {
+        showNotification('SSH Options', 'Please enter a valid option value.', 'error');
+        return;
+    }
+    if (sshOptionsDraft.some(opt => opt.key.toLowerCase() === key.toLowerCase())) {
+        showNotification('SSH Options', `Option "${key}" already exists in the list.`, 'info');
+        return;
+    }
+
+    sshOptionsDraft.push({
+        id: `custom:${key}:${generateId()}`,
+        key,
+        value,
+        description: 'Custom OpenSSH option',
+        enabled: true,
+        preset: false
+    });
+
+    keyInput.value = '';
+    valueInput.value = '';
+    renderSshOptionsList();
+    updateSshAdvCount();
+}
+
+const sshAdvToggle = document.getElementById('ssh-adv-toggle');
+if (sshAdvToggle) {
+    sshAdvToggle.addEventListener('click', () => {
+        const root = document.getElementById('ssh-adv');
+        setSshAdvExpanded(!(root && root.classList.contains('is-open')));
+    });
+}
+
+const sshAdvAddBtn = document.getElementById('ssh-adv-add-btn');
+if (sshAdvAddBtn) {
+    sshAdvAddBtn.addEventListener('click', addCustomSshOption);
+}
+
+['ssh-adv-custom-key', 'ssh-adv-custom-value'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addCustomSshOption();
+        }
+    });
+});
+
+loadSshOptionsDraft([]);
 
 // --- Snippets Logic (Palette Style) ---
 
@@ -3329,13 +4963,18 @@ function renderSnippets(filter = '') {
 
         // Individual Delete button
         const deleteBtn = item.querySelector('.delete-snippet-list-btn');
-        deleteBtn.addEventListener('click', (e) => {
+        deleteBtn.addEventListener('click', async (e) => {
             e.stopPropagation();
-            snippetToDeleteId = snippet.id;
-            snippetsToDeleteIds = [];
-            snippetDeleteTitle.innerText = 'Delete Snippet?';
-            snippetDeleteMessage.innerText = `Are you sure you want to delete snippet "${snippet.name}"? This action cannot be undone.`;
-            snippetDeleteModal.classList.remove('hidden');
+            if (!await showConfirm({
+                title: 'Delete snippet?',
+                message: `Are you sure you want to delete snippet "${snippet.name}"?\n\nThis action cannot be undone.`,
+                confirmText: 'Delete',
+                variant: 'danger'
+            })) return;
+
+            snippets = snippets.filter(s => s.id !== snippet.id);
+            await ipcRenderer.invoke('save-snippets', snippets);
+            renderSnippets(paletteSearchInput.value);
         });
 
         // Checkbox change
@@ -3358,31 +4997,21 @@ function updatePaletteDeleteBtn() {
     }
 }
 
-paletteDeleteBtn.onclick = () => {
+paletteDeleteBtn.onclick = async () => {
     const checked = document.querySelectorAll('.snippet-checkbox:checked');
     if (checked.length === 0) return;
 
-    snippetsToDeleteIds = Array.from(checked).map(cb => cb.dataset.id);
-    snippetToDeleteId = null;
-    snippetDeleteTitle.innerText = 'Delete Snippets?';
-    snippetDeleteMessage.innerText = `Are you sure you want to delete ${checked.length} selected snippets? This action cannot be undone.`;
-    snippetDeleteModal.classList.remove('hidden');
-};
+    const idsToDelete = Array.from(checked).map(cb => cb.dataset.id);
+    if (!await showConfirm({
+        title: checked.length === 1 ? 'Delete snippet?' : 'Delete snippets?',
+        message: `Are you sure you want to delete ${checked.length} selected snippet(s)?\n\nThis action cannot be undone.`,
+        confirmText: 'Delete',
+        variant: 'danger'
+    })) return;
 
-snippetDeleteCancelBtn.onclick = () => {
-    snippetDeleteModal.classList.add('hidden');
-};
-
-snippetDeleteConfirmBtn.onclick = async () => {
-    if (snippetToDeleteId) {
-        snippets = snippets.filter(s => s.id !== snippetToDeleteId);
-    } else if (snippetsToDeleteIds.length > 0) {
-        snippets = snippets.filter(s => !snippetsToDeleteIds.includes(s.id));
-    }
-
+    snippets = snippets.filter(s => !idsToDelete.includes(s.id));
     await ipcRenderer.invoke('save-snippets', snippets);
     renderSnippets(paletteSearchInput.value);
-    snippetDeleteModal.classList.add('hidden');
     paletteDeleteBtn.classList.add('hidden');
 };
 

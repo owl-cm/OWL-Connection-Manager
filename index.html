@@ -17,11 +17,21 @@
 -->
 
 <!DOCTYPE html>
-<html>
+<html class="vault-pending">
 
 <head>
   <meta charset="UTF-8">
   <title>OWL</title>
+  <style>
+    html.vault-pending .container {
+      display: none !important;
+    }
+
+    html.vault-pending body {
+      background: #0a0614;
+      overflow: hidden;
+    }
+  </style>
   <link rel="stylesheet" href="node_modules/xterm/css/xterm.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="stylesheet" href="style.css" />
@@ -29,7 +39,7 @@
 
 <body>
   <div id="notification-container" class="notification-container"></div>
-  <div class="container">
+  <div class="container hidden">
     <div class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="brand">
@@ -37,8 +47,9 @@
             <svg viewBox="0 0 100 100" class="owl-svg">
               <defs>
                 <linearGradient id="owl-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
-                  <stop offset="100%" style="stop-color:#a855f7;stop-opacity:1" />
+                  <stop offset="0%" style="stop-color:#ddd6fe;stop-opacity:1" />
+                  <stop offset="50%" style="stop-color:#a78bfa;stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
                 </linearGradient>
               </defs>
               <!-- Cyber-Shield Owl -->
@@ -50,6 +61,14 @@
           <h2>OWL</h2>
         </div>
         <div class="header-actions">
+          <button id="logout-btn" class="btn-icon btn-icon-logout" title="Lock vault & log out">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.25"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+          </button>
           <button id="settings-btn" class="btn-icon" title="Settings">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round">
@@ -212,37 +231,48 @@
 
             <!-- Bottom Dock: Quick Controls & Metrics -->
             <div class="bottom-dock">
-              <div class="dock-controls">
-                <button id="toggle-explorer-btn" class="dock-btn" title="Toggle Explorer">
-                  <span class="btn-icon folder-icon-container">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#FACC15" stroke-width="2"
-                      stroke-linecap="round" stroke-linejoin="round">
+              <div class="dock-controls" role="toolbar" aria-label="Quick actions">
+                <button id="toggle-explorer-btn" class="dock-btn" data-feature="explorer" title="Toggle Explorer">
+                  <span class="dock-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
                     </svg>
                   </span>
-                  <span class="btn-label">Explorer</span>
+                  <span class="dock-label">Explorer</span>
                 </button>
 
-                <button id="toggle-snippets-btn" class="dock-btn" title="Toggle Snippets">
-                  <span class="btn-icon">
-                    <i class="fas fa-code" style="color: #a855f7;"></i>
-                  </span>
-                  <span class="btn-label">Snippets</span>
+                <button id="toggle-snippets-btn" class="dock-btn" data-feature="snippets" title="Toggle Snippets">
+                  <span class="dock-icon" aria-hidden="true"><i class="fas fa-code"></i></span>
+                  <span class="dock-label">Snippets</span>
                 </button>
 
-                <button id="broadcast-btn" class="dock-btn" title="Broadcast Mode">
-                  <i class="fas fa-tower-broadcast"></i>
-                  <span class="btn-label">Broadcast</span>
+                <button id="broadcast-btn" class="dock-btn" data-feature="broadcast" title="Broadcast Mode">
+                  <span class="dock-icon" aria-hidden="true"><i class="fas fa-tower-broadcast"></i></span>
+                  <span class="dock-label">Broadcast</span>
                 </button>
-                <button id="toggle-processes-btn" class="dock-btn" title="Remote Process Manager">
-                  <i class="fas fa-microchip"></i>
-                  <span class="btn-label">Processes</span>
+
+                <button id="toggle-processes-btn" class="dock-btn" data-feature="processes" title="Remote Process Manager">
+                  <span class="dock-icon" aria-hidden="true"><i class="fas fa-microchip"></i></span>
+                  <span class="dock-label">Processes</span>
                 </button>
-                <button id="toggle-logs-btn" class="dock-btn" title="View Logs">
-                  <i class="fas fa-history"></i>
-                  <span class="btn-label">Logs</span>
+
+                <button id="toggle-docker-btn" class="dock-btn" data-feature="docker" title="Docker Explorer">
+                  <span class="dock-icon" aria-hidden="true"><i class="fab fa-docker"></i></span>
+                  <span class="dock-label">Docker</span>
+                </button>
+
+                <button id="toggle-sage-btn" class="dock-btn" data-feature="sage" title="OWL Sage AI Copilot (Ctrl+Shift+I)">
+                  <span class="dock-icon" aria-hidden="true"><i class="fas fa-wand-magic-sparkles"></i></span>
+                  <span class="dock-label">Sage</span>
+                </button>
+
+                <button id="toggle-logs-btn" class="dock-btn" data-feature="logs" title="View Logs">
+                  <span class="dock-icon" aria-hidden="true"><i class="fas fa-clock-rotate-left"></i></span>
+                  <span class="dock-label">Logs</span>
                 </button>
               </div>
+
+              <div class="dock-divider" aria-hidden="true"></div>
 
               <div id="metrics-dashboard" class="metrics-mini-dashboard">
                 <div class="system-info-mini">
@@ -285,8 +315,8 @@
               <svg viewBox="0 0 100 100" class="owl-svg large">
                 <defs>
                   <linearGradient id="owl-gradient-large" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:#a855f7;stop-opacity:1" />
+                    <stop offset="0%" style="stop-color:#818cf8;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#6366f1;stop-opacity:1" />
                   </linearGradient>
                 </defs>
                 <path d="M50 15 L85 35 L85 75 L50 95 L15 75 L15 35 Z" class="owl-shield"
@@ -463,6 +493,35 @@
                 <input type="password" id="passphrase" placeholder="Enter passphrase if key is encrypted">
               </div>
             </div>
+
+            <div class="form-group" id="ssh-options-group">
+              <div class="ssh-adv" id="ssh-adv">
+                <button type="button" class="ssh-adv-toggle" id="ssh-adv-toggle" aria-expanded="false">
+                  <span class="ssh-adv-toggle-left">
+                    <i class="fas fa-sliders ssh-adv-chevron" aria-hidden="true"></i>
+                    <span class="ssh-adv-title">Advanced SSH Options</span>
+                  </span>
+                  <span class="ssh-adv-toggle-right">
+                    <span class="ssh-adv-count" id="ssh-adv-count">0 active</span>
+                    <i class="fas fa-chevron-down ssh-adv-arrow" aria-hidden="true"></i>
+                  </span>
+                </button>
+                <div class="ssh-adv-body hidden" id="ssh-adv-body">
+                  <p class="ssh-adv-hint">Popular OpenSSH options stay off until you enable them. Applied as <code>-o</code> flags when opening a terminal.</p>
+                  <div class="ssh-adv-list" id="ssh-adv-list"></div>
+                  <div class="ssh-adv-custom">
+                    <div class="ssh-adv-custom-row">
+                      <input type="text" id="ssh-adv-custom-key" placeholder="Option name" autocomplete="off" spellcheck="false">
+                      <input type="text" id="ssh-adv-custom-value" placeholder="Value" autocomplete="off" spellcheck="false">
+                      <button type="button" id="ssh-adv-add-btn" class="ssh-adv-add-btn" title="Add custom option">
+                        <i class="fas fa-plus"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div class="form-group" id="color-group">
               <label>Color Label</label>
               <div class="color-picker">
@@ -531,39 +590,15 @@
       </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div id="delete-modal" class="modal hidden">
-      <div class="modal-content">
-        <h3 id="delete-modal-title">Delete Connection?</h3>
-        <p id="delete-modal-message">Are you sure you want to delete this connection? This action cannot be undone.</p>
-        <div class="form-actions">
-          <button type="button" id="delete-cancel-btn" class="btn-secondary">Cancel</button>
-          <button type="button" id="delete-confirm-btn" class="btn-danger">Delete</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Snippet Delete Confirmation Modal -->
-    <div id="snippet-delete-modal" class="modal hidden">
-      <div class="modal-content">
-        <h3 id="snippet-delete-title">Delete Snippet?</h3>
-        <p id="snippet-delete-message">Are you sure you want to delete this snippet? This action cannot be undone.</p>
-        <div class="form-actions">
-          <button type="button" id="snippet-delete-cancel-btn" class="btn-secondary">Cancel</button>
-          <button type="button" id="snippet-delete-confirm-btn" class="btn-danger">Delete</button>
-        </div>
-      </div>
-    </div>
-
     <!-- Broadcast Confirmation Modal -->
     <div id="broadcast-modal" class="modal hidden">
-      <div class="modal-content modal-lg">
-        <div class="modal-header-center">
-          <div class="lock-icon-large">
+      <div class="modal-content modal-lg owl-shell-wide">
+        <div class="owl-shell-header">
+          <div class="owl-shell-icon">
             <i class="fas fa-broadcast-tower"></i>
           </div>
           <h3>Activate Broadcast Mode?</h3>
-          <p class="text-secondary">Select the active terminals you want to broadcast your keystrokes to.</p>
+          <p>Select the active terminals you want to broadcast your keystrokes to.</p>
         </div>
 
         <div class="export-selection-container">
@@ -579,7 +614,7 @@
           </div>
         </div>
 
-        <div class="form-actions">
+        <div class="owl-shell-actions">
           <button type="button" id="broadcast-cancel-btn" class="btn-secondary">Cancel</button>
           <button type="button" id="broadcast-confirm-btn" class="btn-danger">Activate Broadcast</button>
         </div>
@@ -588,7 +623,7 @@
 
     <!-- Logs Modal -->
     <div id="logs-modal" class="modal hidden">
-      <div class="modal-content modal-xl">
+      <div class="modal-content modal-xl owl-shell-wide">
         <div class="modal-header">
           <div class="header-left">
             <h3>Session Logs</h3>
@@ -661,8 +696,85 @@
   </div>
 
   <!-- Process Manager Modal -->
+  <!-- Docker Explorer Modal -->
+  <div id="docker-modal" class="modal hidden">
+    <div class="modal-content modal-xl docker-explorer-modal owl-shell-wide">
+      <div class="modal-header docker-modal-header">
+        <div class="docker-header-row">
+          <div class="docker-header-titles">
+            <h3><i class="fab fa-docker docker-title-icon"></i>Docker Explorer</h3>
+            <p id="docker-modal-subtitle" class="docker-modal-subtitle"></p>
+          </div>
+          <div class="header-actions">
+            <button id="refresh-docker" class="btn-icon" title="Refresh current view"><i class="fas fa-sync"></i></button>
+            <button class="close-btn" id="close-docker-header-btn">✕</button>
+          </div>
+        </div>
+        <div id="docker-stats" class="docker-stats hidden">
+          <span class="docker-stat"><i class="fas fa-play-circle"></i><span id="docker-stat-running">0</span> running</span>
+          <span class="docker-stat"><i class="fas fa-box"></i><span id="docker-stat-containers">0</span> containers</span>
+          <span class="docker-stat"><i class="fas fa-layer-group"></i><span id="docker-stat-images">0</span> images</span>
+          <span class="docker-stat"><i class="fas fa-database"></i><span id="docker-stat-volumes">0</span> volumes</span>
+        </div>
+      </div>
+
+      <div id="docker-status-banner" class="docker-status-banner hidden"></div>
+
+      <div class="docker-explorer-container">
+        <div class="docker-sidebar">
+          <div class="docker-sidebar-search search-input-wrapper">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="docker-search" placeholder="Filter resources...">
+          </div>
+
+          <div class="docker-tabs docker-tabs-row" role="tablist">
+            <button type="button" class="docker-tab active" data-tab="containers" role="tab">
+              <i class="fas fa-box"></i><span>Containers</span>
+            </button>
+            <button type="button" class="docker-tab" data-tab="images" role="tab">
+              <i class="fas fa-layer-group"></i><span>Images</span>
+            </button>
+            <button type="button" class="docker-tab" data-tab="volumes" role="tab">
+              <i class="fas fa-database"></i><span>Volumes</span>
+            </button>
+          </div>
+
+          <div id="docker-resource-list" class="docker-resource-list">
+            <div class="docker-empty-state">Select a tab to load resources</div>
+          </div>
+        </div>
+
+        <div class="docker-viewer">
+          <div class="docker-viewer-top">
+            <div class="docker-viewer-title-row">
+              <span id="docker-viewer-title" class="docker-viewer-title">Details &amp; Live Logs</span>
+              <div class="docker-log-controls">
+                <button id="docker-toggle-follow" class="docker-log-btn active hidden" title="Auto-scroll logs">
+                  <i class="fas fa-arrow-down"></i>
+                </button>
+                <button id="docker-clear-logs" class="docker-log-btn hidden" title="Clear log view">
+                  <i class="fas fa-eraser"></i>
+                </button>
+                <button id="docker-stop-logs" class="docker-log-btn docker-log-btn-stop hidden" title="Stop live stream">
+                  <i class="fas fa-stop"></i>
+                </button>
+              </div>
+            </div>
+            <div id="docker-action-bar" class="docker-action-bar hidden"></div>
+          </div>
+
+          <div id="docker-details-panel" class="docker-details-panel hidden"></div>
+
+          <div id="docker-logs-viewer" class="docker-logs-viewer terminal-theme">
+            <div class="log-empty-state" id="docker-logs-empty">Select a container to stream live logs</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="process-modal" class="modal hidden">
-    <div class="modal-content large">
+    <div class="modal-content large owl-shell-wide">
       <div class="modal-header">
         <h3>Remote Process Manager</h3>
         <div class="header-actions">
@@ -695,7 +807,7 @@
 
   <!-- Settings Modal -->
   <div id="settings-modal" class="modal hidden">
-    <div class="modal-content">
+    <div class="modal-content owl-shell-wide">
       <div class="modal-header">
         <h3>Preferences</h3>
         <button class="close-btn" id="close-settings-btn">✕</button>
@@ -704,10 +816,10 @@
         <div class="settings-section">
           <div class="settings-section-title">Logging</div>
           <div class="form-group checkbox-group">
-            <label class="checkbox-container">
-              Enable Logging by Default
+            <label class="checkbox-container settings-checkbox">
               <input type="checkbox" id="pref-default-logging">
               <span class="checkmark"></span>
+              <span class="settings-checkbox-label">Enable Logging by Default</span>
             </label>
           </div>
           <div class="form-group">
@@ -731,6 +843,49 @@
             </select>
           </div>
         </div>
+
+        <div class="settings-section">
+          <div class="settings-section-title">OWL Sage</div>
+          <div class="form-group checkbox-group">
+            <label class="checkbox-container settings-checkbox">
+              <input type="checkbox" id="pref-sage-enabled">
+              <span class="checkmark"></span>
+              <span class="settings-checkbox-label">Enable OWL Sage AI Copilot</span>
+            </label>
+          </div>
+          <div class="form-group">
+            <label>Provider</label>
+            <select id="pref-sage-provider">
+              <option value="litellm">LiteLLM (OpenAI-compatible)</option>
+              <option value="openai">OpenAI</option>
+              <option value="anthropic">Anthropic</option>
+              <option value="gemini">Google Gemini</option>
+            </select>
+            <small class="form-text">Choose your AI provider. LiteLLM works with any OpenAI-compatible gateway.</small>
+          </div>
+          <div class="form-group" id="sage-base-url-group">
+            <label>Base URL</label>
+            <input type="text" id="pref-sage-base-url" placeholder="http://localhost:4000/v1">
+            <small class="form-text" id="sage-base-url-hint">OpenAI-compatible endpoint. LiteLLM default: http://localhost:4000/v1</small>
+          </div>
+          <div class="form-group">
+            <label>API Key</label>
+            <input type="password" id="pref-sage-api-key" placeholder="sk-..." autocomplete="off">
+            <small class="form-text" id="sage-api-key-hint">Stored encrypted in your vault. Sent only to the selected provider.</small>
+          </div>
+          <div class="form-group">
+            <label>Model</label>
+            <input type="text" id="pref-sage-model" placeholder="gpt-4o-mini">
+            <small class="form-text" id="sage-model-hint">Model name for the selected provider.</small>
+          </div>
+          <div class="form-group checkbox-group">
+            <label class="checkbox-container settings-checkbox">
+              <input type="checkbox" id="pref-sage-redaction" checked>
+              <span class="checkmark"></span>
+              <span class="settings-checkbox-label">Redact secrets before sending to AI</span>
+            </label>
+          </div>
+        </div>
       </div>
       <div class="form-actions">
         <button type="button" id="save-settings-btn" class="btn-primary">Save Preferences</button>
@@ -738,9 +893,51 @@
     </div>
   </div>
 
+  <!-- OWL Sage AI Panel -->
+  <div id="sage-panel" class="sage-panel hidden">
+    <div class="sage-panel-header">
+      <div class="sage-header-titles">
+        <h3><i class="fas fa-wand-magic-sparkles sage-title-icon"></i>OWL Sage</h3>
+        <p id="sage-connection-badge" class="sage-connection-badge">No active session</p>
+      </div>
+      <div class="sage-header-actions">
+        <button type="button" id="sage-clear-chat-btn" class="btn-icon" title="Clear chat"><i class="fas fa-eraser"></i></button>
+        <button type="button" id="close-sage-panel-btn" class="close-btn">✕</button>
+      </div>
+    </div>
+
+    <div id="sage-not-configured" class="sage-not-configured hidden">
+      <i class="fas fa-robot sage-not-configured-icon"></i>
+      <p>Configure an AI provider in Settings to enable OWL Sage.</p>
+      <button type="button" id="sage-open-settings-btn" class="btn-primary">Open Settings</button>
+    </div>
+
+    <div id="sage-panel-body" class="sage-panel-body">
+      <div class="sage-context-bar">
+        <button type="button" id="sage-btn-selection" class="sage-chip-btn" title="Attach terminal selection"><i class="fas fa-i-cursor"></i> Selection</button>
+        <button type="button" id="sage-btn-terminal" class="sage-chip-btn" title="Attach recent terminal output"><i class="fas fa-terminal"></i> Terminal</button>
+        <button type="button" id="sage-btn-diagnose" class="sage-chip-btn" title="Gather metrics, processes, Docker"><i class="fas fa-stethoscope"></i> Diagnose</button>
+      </div>
+      <div id="sage-context-preview" class="sage-context-preview hidden"></div>
+      <div id="sage-messages" class="sage-messages">
+        <div class="sage-welcome">
+          <p>Ask Sage to explain errors, suggest commands, or diagnose your server.</p>
+          <p class="sage-welcome-hint">Use <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd> to open anytime.</p>
+        </div>
+      </div>
+      <div class="sage-input-area">
+        <textarea id="sage-input" rows="3" placeholder="Ask Sage about this server..."></textarea>
+        <div class="sage-input-actions">
+          <button type="button" id="sage-stop-btn" class="btn-secondary hidden">Stop</button>
+          <button type="button" id="sage-send-btn" class="btn-primary"><i class="fas fa-paper-plane"></i> Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Snippet Modal -->
   <div id="snippet-modal" class="modal hidden" style="z-index: 1100;">
-    <div class="modal-content">
+    <div class="modal-content owl-shell-wide">
       <h3>Edit Snippet</h3>
       <form id="snippet-form">
         <div class="form-group">
@@ -760,87 +957,193 @@
     </div>
   </div>
 
-  <!-- Vault Setup Modal -->
-  <div id="vault-setup-modal" class="modal hidden" style="z-index: 2000;">
-    <div class="modal-content">
-      <div class="modal-header-center">
-        <div class="lock-icon-large">
-          <i class="fas fa-shield-alt"></i>
-        </div>
-        <h3>Secure Your Vault</h3>
-        <p class="text-secondary">Create a master password to encrypt your connections.</p>
+  <!-- App Confirm Dialog (outside .container so it works while vault is locked) -->
+  <div id="confirm-modal" class="modal hidden" style="z-index: 2500;">
+    <div class="modal-content owl-shell-compact">
+      <div class="owl-shell-mini-brand">
+        <svg viewBox="0 0 100 100" class="owl-shell-mini-logo" aria-hidden="true">
+          <path d="M50 15 L85 35 L85 75 L50 95 L15 75 L15 35 Z" fill="none" stroke="#a78bfa" stroke-width="3" stroke-linejoin="round" />
+          <path d="M30 45 L45 60 M70 45 L55 60" fill="none" stroke="#f8fafc" stroke-width="4" stroke-linecap="round" />
+        </svg>
+        <span class="owl-shell-mini-name">OWL</span>
       </div>
-      <form id="vault-setup-form">
-        <div class="form-group">
-          <label>Master Password</label>
-          <input type="password" id="vault-setup-password" required placeholder="Enter a strong password" minlength="8">
+      <div class="owl-shell-icon" id="confirm-modal-icon" aria-hidden="true">
+        <i class="fas fa-circle-question"></i>
+      </div>
+      <h3 id="confirm-modal-title">Are you sure?</h3>
+      <p id="confirm-modal-message" class="owl-shell-message"></p>
+      <div class="owl-shell-actions">
+        <button type="button" id="confirm-modal-cancel-btn" class="btn-secondary">Cancel</button>
+        <button type="button" id="confirm-modal-ok-btn" class="btn-danger">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vault Setup Modal -->
+  <div id="vault-setup-modal" class="modal vault-auth-modal hidden" style="z-index: 2000;">
+    <div class="modal-content owl-auth-card">
+      <div class="owl-auth-aura" aria-hidden="true"></div>
+      <header class="owl-auth-brand">
+        <div class="owl-auth-logo-wrap">
+          <svg viewBox="0 0 100 100" class="owl-auth-logo" aria-hidden="true">
+            <defs>
+              <linearGradient id="owl-gradient-auth-setup" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ddd6fe" />
+                <stop offset="50%" stop-color="#a78bfa" />
+                <stop offset="100%" stop-color="#7c3aed" />
+              </linearGradient>
+            </defs>
+            <g class="owl-auth-mark" transform="translate(2 -5)">
+            <path d="M50 15 L85 35 L85 75 L50 95 L15 75 L15 35 Z" class="owl-shield-auth" stroke="url(#owl-gradient-auth-setup)" />
+            <path d="M30 45 L45 60 M70 45 L55 60" class="owl-eyes-auth" />
+            <rect x="48" y="70" width="4" height="10" class="owl-cursor-auth" />
+            </g>
+          </svg>
         </div>
-        <div class="form-group">
-          <label>Confirm Password</label>
-          <input type="password" id="vault-setup-confirm" required placeholder="Repeat password">
+        <div class="owl-auth-wordmark">
+          <span class="owl-auth-name">OWL</span>
+          <span class="owl-auth-tagline">Connection Manager</span>
         </div>
-        <div class="form-actions">
-          <button type="submit" class="btn-primary full-width">Encrypt & Start</button>
-        </div>
-      </form>
+      </header>
+
+      <section class="owl-auth-content">
+        <h2 class="owl-auth-heading">Secure your vault</h2>
+        <p class="owl-auth-desc">Create a master password to encrypt your connections.</p>
+
+        <form id="vault-setup-form" class="owl-auth-form">
+          <label class="owl-auth-field" for="vault-setup-password">
+            <span class="owl-auth-field-label">Master password</span>
+            <div class="owl-auth-input-wrap">
+              <i class="fas fa-shield-halved" aria-hidden="true"></i>
+              <input type="password" id="vault-setup-password" required placeholder="Enter a strong password" minlength="8">
+            </div>
+          </label>
+          <label class="owl-auth-field" for="vault-setup-confirm">
+            <span class="owl-auth-field-label">Confirm password</span>
+            <div class="owl-auth-input-wrap">
+              <i class="fas fa-check-double" aria-hidden="true"></i>
+              <input type="password" id="vault-setup-confirm" required placeholder="Repeat password">
+            </div>
+          </label>
+          <button type="submit" class="owl-auth-submit">
+            <span>Encrypt & Start</span>
+            <i class="fas fa-arrow-right" aria-hidden="true"></i>
+          </button>
+        </form>
+      </section>
     </div>
   </div>
 
   <!-- Vault Unlock Modal -->
-  <div id="vault-unlock-modal" class="modal hidden" style="z-index: 2000;">
-    <div class="modal-content">
-      <div class="modal-header-center">
-        <div class="lock-icon-large">
-          <i class="fas fa-lock"></i>
+  <div id="vault-unlock-modal" class="modal vault-auth-modal hidden" style="z-index: 2000;">
+    <div class="modal-content owl-auth-card">
+      <div class="owl-auth-aura" aria-hidden="true"></div>
+      <header class="owl-auth-brand">
+        <div class="owl-auth-logo-wrap">
+          <svg viewBox="0 0 100 100" class="owl-auth-logo" aria-hidden="true">
+            <defs>
+              <linearGradient id="owl-gradient-auth-unlock" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ddd6fe" />
+                <stop offset="50%" stop-color="#a78bfa" />
+                <stop offset="100%" stop-color="#7c3aed" />
+              </linearGradient>
+            </defs>
+            <g class="owl-auth-mark" transform="translate(2 -5)">
+            <path d="M50 15 L85 35 L85 75 L50 95 L15 75 L15 35 Z" class="owl-shield-auth" stroke="url(#owl-gradient-auth-unlock)" />
+            <path d="M30 45 L45 60 M70 45 L55 60" class="owl-eyes-auth" />
+            <rect x="48" y="70" width="4" height="10" class="owl-cursor-auth" />
+            </g>
+          </svg>
         </div>
-        <h3>Unlock Vault</h3>
-        <p class="text-secondary">Enter your master password to access connections.</p>
-      </div>
-      <form id="vault-unlock-form">
-        <div class="form-group">
-          <input type="password" id="vault-unlock-password" required placeholder="Master Password" autofocus>
+        <div class="owl-auth-wordmark">
+          <span class="owl-auth-name">OWL</span>
+          <span class="owl-auth-tagline">Connection Manager</span>
         </div>
-        <div class="form-actions">
-          <button type="submit" class="btn-primary full-width">Unlock</button>
-        </div>
-        <div class="text-center mt-2">
-          <a href="#" id="vault-reset-link" class="text-danger text-small">Reset Vault (Deletes All Data)</a>
-        </div>
-      </form>
+      </header>
+
+      <section class="owl-auth-content">
+        <h2 class="owl-auth-heading">Unlock vault</h2>
+        <p class="owl-auth-desc">Enter your master password to access encrypted connections.</p>
+
+        <form id="vault-unlock-form" class="owl-auth-form">
+          <label class="owl-auth-field" for="vault-unlock-password">
+            <span class="owl-auth-field-label">Master password</span>
+            <div class="owl-auth-input-wrap">
+              <i class="fas fa-lock" aria-hidden="true"></i>
+              <input type="password" id="vault-unlock-password" required placeholder="Enter master password" autofocus>
+            </div>
+          </label>
+          <button type="submit" class="owl-auth-submit">
+            <span>Unlock</span>
+            <i class="fas fa-arrow-right" aria-hidden="true"></i>
+          </button>
+        </form>
+
+        <footer class="owl-auth-footer">
+          <a href="#" id="vault-reset-link" class="owl-auth-reset">Reset vault (deletes all data)</a>
+        </footer>
+      </section>
     </div>
   </div>
 
   <!-- Decrypt Backup Modal -->
-  <div id="import-decrypt-modal" class="modal hidden" style="z-index: 2000;">
-    <div class="modal-content">
-      <div class="modal-header-center">
-        <div class="lock-icon-large">
-          <i class="fas fa-file-import"></i>
+  <div id="import-decrypt-modal" class="modal vault-auth-modal hidden" style="z-index: 2000;">
+    <div class="modal-content owl-auth-card">
+      <div class="owl-auth-aura" aria-hidden="true"></div>
+      <header class="owl-auth-brand">
+        <div class="owl-auth-logo-wrap">
+          <svg viewBox="0 0 100 100" class="owl-auth-logo" aria-hidden="true">
+            <defs>
+              <linearGradient id="owl-gradient-auth-import" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ddd6fe" />
+                <stop offset="50%" stop-color="#a78bfa" />
+                <stop offset="100%" stop-color="#7c3aed" />
+              </linearGradient>
+            </defs>
+            <g class="owl-auth-mark" transform="translate(2 -5)">
+            <path d="M50 15 L85 35 L85 75 L50 95 L15 75 L15 35 Z" class="owl-shield-auth" stroke="url(#owl-gradient-auth-import)" />
+            <path d="M30 45 L45 60 M70 45 L55 60" class="owl-eyes-auth" />
+            <rect x="48" y="70" width="4" height="10" class="owl-cursor-auth" />
+            </g>
+          </svg>
         </div>
-        <h3>Decrypt Backup</h3>
-        <p class="text-secondary">Enter the password used to encrypt this backup file.</p>
-      </div>
-      <form id="import-decrypt-form">
-        <div class="form-group">
-          <input type="password" id="import-decrypt-password" required placeholder="Backup Password" autofocus>
+        <div class="owl-auth-wordmark">
+          <span class="owl-auth-name">OWL</span>
+          <span class="owl-auth-tagline">Connection Manager</span>
         </div>
-        <div class="form-actions">
-          <button type="submit" class="btn-primary full-width">Decrypt & Import</button>
-          <button type="button" id="import-decrypt-cancel" class="btn-secondary full-width mt-2">Cancel</button>
-        </div>
-      </form>
+      </header>
+
+      <section class="owl-auth-content">
+        <h2 class="owl-auth-heading">Decrypt backup</h2>
+        <p class="owl-auth-desc">Enter the password used to encrypt this backup file.</p>
+
+        <form id="import-decrypt-form" class="owl-auth-form">
+          <label class="owl-auth-field" for="import-decrypt-password">
+            <span class="owl-auth-field-label">Backup password</span>
+            <div class="owl-auth-input-wrap">
+              <i class="fas fa-file-import" aria-hidden="true"></i>
+              <input type="password" id="import-decrypt-password" required placeholder="Enter backup password" autofocus>
+            </div>
+          </label>
+          <button type="submit" class="owl-auth-submit">
+            <span>Decrypt & Import</span>
+            <i class="fas fa-arrow-right" aria-hidden="true"></i>
+          </button>
+          <button type="button" id="import-decrypt-cancel" class="owl-auth-secondary">Cancel</button>
+        </form>
+      </section>
     </div>
   </div>
 
   <!-- Export Password Modal -->
   <div id="export-password-modal" class="modal export-password-modal hidden" style="z-index: 2000;">
-    <div class="modal-content modal-lg">
-      <div class="modal-header-center">
-        <div class="lock-icon-large">
+    <div class="modal-content modal-lg owl-shell-wide">
+      <div class="owl-shell-header">
+        <div class="owl-shell-icon">
           <i class="fas fa-file-export"></i>
         </div>
         <h3>Secure Export</h3>
-        <p class="text-secondary">Select items to export and set a password.</p>
+        <p>Select items to export and set a password.</p>
       </div>
 
       <div class="export-search-bar">
@@ -880,6 +1183,7 @@
   <div id="action-menu" class="context-menu hidden">
     <div class="menu-item" id="action-edit">Edit</div>
     <div class="menu-item" id="action-clone">Clone</div>
+    <div class="menu-item" id="action-docker"><i class="fab fa-docker" style="margin-right:8px;opacity:0.8;"></i>Docker Explorer</div>
     <div class="menu-separator"></div>
     <div class="menu-item text-danger" id="action-delete">Delete</div>
   </div>

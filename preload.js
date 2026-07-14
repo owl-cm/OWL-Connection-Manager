@@ -55,6 +55,16 @@ contextBridge.exposeInMainWorld('terminalFactory', {
             focus: () => term.focus(),
             getSelection: () => term.getSelection(),
             hasSelection: () => term.hasSelection(),
+            getRecentLines: (maxLines = 80) => {
+                const buffer = term.buffer.active;
+                const lines = [];
+                const start = Math.max(0, buffer.length - maxLines);
+                for (let i = start; i < buffer.length; i++) {
+                    const line = buffer.getLine(i);
+                    lines.push(line ? line.translateToString(true) : '');
+                }
+                return lines.join('\n');
+            },
             onSelectionChange: (callback) => {
                 const disposable = term.onSelectionChange(callback);
                 return { dispose: () => disposable.dispose() };
