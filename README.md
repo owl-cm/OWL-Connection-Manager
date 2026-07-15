@@ -60,7 +60,6 @@
 
 ### 📊 Real-Time Monitoring
 - **Metrics Dashboard**: Live tracking of **CPU**, **RAM**, and **Disk** usage on your connected remote hosts.
-- **Remote Process Manager**: A full-featured task manager to view, search, and kill processes on the remote server.
 - **System Insights**: Instant visibility into the remote OS version and system uptime.
 
 ### 🛠️ Productivity & Management
