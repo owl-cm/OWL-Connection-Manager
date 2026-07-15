@@ -71,6 +71,7 @@ function showConfirm({
 } = {}) {
     const confirmModal = document.getElementById('confirm-modal');
     const confirmModalTitle = document.getElementById('confirm-modal-title');
+    const confirmModalLead = document.getElementById('confirm-modal-lead');
     const confirmModalMessage = document.getElementById('confirm-modal-message');
     const confirmModalOkBtn = document.getElementById('confirm-modal-ok-btn');
     const confirmModalCancelBtn = document.getElementById('confirm-modal-cancel-btn');
@@ -84,7 +85,13 @@ function showConfirm({
 
         confirmModalResolver = resolve;
         confirmModalTitle.textContent = title;
-        confirmModalMessage.textContent = message;
+
+        const parts = String(message || '').split(/\n\s*\n/);
+        const lead = (parts[0] || '').trim();
+        const detail = parts.slice(1).join('\n\n').trim();
+        if (confirmModalLead) confirmModalLead.textContent = detail ? lead : '';
+        confirmModalMessage.textContent = detail || lead;
+
         confirmModalOkBtn.textContent = confirmText;
         confirmModalCancelBtn.textContent = cancelText;
 
@@ -155,6 +162,86 @@ const tabContextMenu = document.getElementById('tab-context-menu');
 const logoutBtn = document.getElementById('logout-btn');
 const exportBtn = document.getElementById('export-btn');
 const importBtn = document.getElementById('import-btn');
+const profileMenuBtn = document.getElementById('profile-menu-btn');
+const profileMenuDropdown = document.getElementById('profile-menu-dropdown');
+const profileMenu = document.getElementById('profile-menu');
+let profileMenuCloseTimer = null;
+let profileMenuPinned = false;
+
+function clearProfileMenuCloseTimer() {
+    if (profileMenuCloseTimer) {
+        clearTimeout(profileMenuCloseTimer);
+        profileMenuCloseTimer = null;
+    }
+}
+
+function closeProfileMenu() {
+    if (!profileMenuDropdown || !profileMenuBtn) return;
+    clearProfileMenuCloseTimer();
+    profileMenuPinned = false;
+    profileMenuDropdown.classList.remove('is-open');
+    profileMenuDropdown.classList.add('hidden');
+    profileMenuBtn.classList.remove('is-open');
+    profileMenuBtn.setAttribute('aria-expanded', 'false');
+}
+
+function openProfileMenu({ pinned = false } = {}) {
+    if (!profileMenuDropdown || !profileMenuBtn) return;
+    clearProfileMenuCloseTimer();
+    if (pinned) profileMenuPinned = true;
+
+    const wasOpen = profileMenuDropdown.classList.contains('is-open');
+    profileMenuDropdown.classList.remove('hidden');
+    if (!wasOpen) {
+        void profileMenuDropdown.offsetWidth;
+    }
+    profileMenuDropdown.classList.add('is-open');
+    profileMenuBtn.classList.add('is-open');
+    profileMenuBtn.setAttribute('aria-expanded', 'true');
+}
+
+function scheduleProfileMenuClose(delay = 220) {
+    clearProfileMenuCloseTimer();
+    profileMenuCloseTimer = setTimeout(() => {
+        if (profileMenuPinned) return;
+        if (profileMenu && profileMenu.matches(':hover')) return;
+        closeProfileMenu();
+    }, delay);
+}
+
+function toggleProfileMenu() {
+    if (!profileMenuDropdown) return;
+    const isOpen = profileMenuDropdown.classList.contains('is-open');
+    if (isOpen && profileMenuPinned) {
+        closeProfileMenu();
+        return;
+    }
+    openProfileMenu({ pinned: true });
+}
+
+if (profileMenuBtn) {
+    profileMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleProfileMenu();
+    });
+}
+
+if (profileMenu) {
+    profileMenu.addEventListener('mouseenter', () => {
+        openProfileMenu({ pinned: false });
+    });
+    profileMenu.addEventListener('mouseleave', () => {
+        scheduleProfileMenuClose();
+    });
+}
+
+if (profileMenuDropdown) {
+    profileMenuDropdown.addEventListener('click', (e) => {
+        if (e.target.closest('.profile-menu-item')) {
+            setTimeout(() => closeProfileMenu(), 0);
+        }
+    });
+}
 const broadcastModal = document.getElementById('broadcast-modal');
 const broadcastConfirmBtn = document.getElementById('broadcast-confirm-btn');
 const broadcastCancelBtn = document.getElementById('broadcast-cancel-btn');
@@ -238,12 +325,6 @@ const connectionSearch = document.getElementById('connection-search');
 const broadcastBtn = document.getElementById('broadcast-btn');
 const osInfo = document.getElementById('os-info');
 const uptimeInfo = document.getElementById('uptime-info');
-
-const toggleProcessesBtn = document.getElementById('toggle-processes-btn');
-const processModal = document.getElementById('process-modal');
-const processListBody = document.getElementById('process-list-body');
-const refreshProcessesBtn = document.getElementById('refresh-processes');
-const closeProcessModalBtn = document.getElementById('close-process-modal');
 
 // Docker Explorer Elements
 const toggleDockerBtn = document.getElementById('toggle-docker-btn');
@@ -648,6 +729,7 @@ async function loadAndRenderConnections() {
     const savedSettings = localStorage.getItem('owl_settings');
     if (savedSettings) {
         settings = JSON.parse(savedSettings);
+        delete settings.theme;
     }
     applySettingsToUI();
 
@@ -747,12 +829,18 @@ if (vaultResetLink) {
 }
 
 // Global click to hide menus
-document.addEventListener('click', () => {
+document.addEventListener('click', (e) => {
     contextMenu.classList.add('hidden');
     actionMenu.classList.add('hidden');
     tabContextMenu.classList.add('hidden');
+    if (!profileMenu || !profileMenu.contains(e.target)) {
+        closeProfileMenu();
+    }
 });
 
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeProfileMenu();
+});
 // Handle Resize
 window.onresize = () => {
     fitActiveTerminal();
@@ -1038,14 +1126,6 @@ function toggleBroadcastMode() {
     }
 }
 
-// Process Manager Listeners
-toggleProcessesBtn.onclick = () => {
-    if (toggleProcessesBtn.classList.contains('disabled')) return;
-    if (!activeSessionId) return;
-    processModal.classList.remove('hidden');
-    loadProcesses();
-};
-
 // Logs Listeners
 toggleLogsBtn.onclick = () => {
     logsModal.classList.remove('hidden');
@@ -1113,10 +1193,6 @@ window.addEventListener('keydown', (e) => {
         logContentSearch.focus();
     }
 });
-
-refreshProcessesBtn.onclick = () => loadProcesses();
-closeProcessModalBtn.onclick = () => processModal.classList.add('hidden');
-document.getElementById('close-process-header-btn').onclick = () => processModal.classList.add('hidden');
 
 // Docker Explorer Listeners
 toggleDockerBtn.onclick = () => {
@@ -1580,7 +1656,6 @@ function updateDockButtonsState() {
     const hasActiveSession = !!activeSessionId;
     toggleExplorerBtn.classList.toggle('disabled', !hasActiveSession);
     broadcastBtn.classList.toggle('disabled', !hasActiveSession);
-    toggleProcessesBtn.classList.toggle('disabled', !hasActiveSession);
     toggleDockerBtn.classList.toggle('disabled', !hasActiveSession);
     if (toggleSageBtn) {
         toggleSageBtn.classList.toggle('disabled', !hasActiveSession || !isSageConfigured());
@@ -2287,7 +2362,6 @@ function activateSession(sessionId) {
         // Enable dock buttons
         toggleExplorerBtn.classList.remove('disabled');
         broadcastBtn.classList.remove('disabled');
-        toggleProcessesBtn.classList.remove('disabled');
         toggleDockerBtn.classList.toggle('disabled', !isDockerCapableConnection(session.connection));
         updateDockButtonsState();
 
@@ -2306,7 +2380,6 @@ function activateSession(sessionId) {
         // Disable dock buttons
         toggleExplorerBtn.classList.add('disabled');
         broadcastBtn.classList.add('disabled');
-        toggleProcessesBtn.classList.add('disabled');
         toggleDockerBtn.classList.add('disabled');
         updateDockButtonsState();
 
@@ -3114,27 +3187,9 @@ class OnboardingTour {
                 position: "center"
             },
             {
-                title: "Settings & Preferences",
-                text: "Customize your experience, manage and configure global application preferences here.",
-                target: "#settings-btn",
-                position: "right"
-            },
-            {
-                title: "Data Portability",
-                text: "Export your connections to a secure backup or import existing data from other devices.",
-                target: "#export-btn",
-                position: "right"
-            },
-            {
-                title: "Organize with Folders",
-                text: "Create folders to group your connections by project, environment, or client.",
-                target: "#add-folder-btn",
-                position: "right"
-            },
-            {
-                title: "New Connection",
-                text: "Add a new SSH, RDP, or VNC connection to your workspace.",
-                target: "#add-btn",
+                title: "Account menu",
+                text: "Open the profile menu to add connections or folders, import/export backups, open Preferences, or lock the vault.",
+                target: "#profile-menu-btn",
                 position: "right"
             },
             {
@@ -3171,12 +3226,6 @@ class OnboardingTour {
                 title: "Broadcast Mode",
                 text: "Send your keystrokes to all active terminals at once. Perfect for managing clusters.",
                 target: "#broadcast-btn",
-                position: "top"
-            },
-            {
-                title: "Process Manager",
-                text: "Monitor and manage remote processes directly from the UI without typing 'top' or 'ps'.",
-                target: "#toggle-processes-btn",
                 position: "top"
             },
             {
@@ -3377,37 +3426,6 @@ class OnboardingTour {
 }
 
 
-
-async function loadProcesses() {
-    if (!activeSessionId) return;
-    const session = sessions[activeSessionId];
-    processListBody.innerHTML = '<tr><td colspan="6" style="text-align:center">Loading...</td></tr>';
-    const processes = await ipcRenderer.invoke('get-processes', { connection: session.connection });
-    processListBody.innerHTML = '';
-    processes.forEach(p => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${p.pid}</td>
-            <td>${p.user}</td>
-            <td>${p.cpu}%</td>
-            <td>${p.mem}%</td>
-            <td title="${p.comm}">${p.comm}</td>
-            <td><button class="btn-kill" data-pid="${p.pid}">Kill</button></td>
-        `;
-        tr.querySelector('.btn-kill').onclick = async () => {
-            if (await showConfirm({
-                title: 'Kill process?',
-                message: `Kill process ${p.pid} (${p.comm})?`,
-                confirmText: 'Kill',
-                variant: 'danger'
-            })) {
-                const success = await ipcRenderer.invoke('kill-process', { connection: session.connection, pid: p.pid });
-                if (success) loadProcesses();
-            }
-        };
-        processListBody.appendChild(tr);
-    });
-}
 
 function isDockerCapableConnection(connection) {
     if (!connection || connection.type === 'folder') return false;
@@ -5152,6 +5170,13 @@ if (qaImport) {
     qaImport.onclick = () => {
         console.log('Import Data clicked');
         document.getElementById('import-btn').click();
+    };
+}
+
+const qaDocs = document.getElementById('qa-docs');
+if (qaDocs) {
+    qaDocs.onclick = async () => {
+        await ipcRenderer.invoke('open-external', 'https://owl-cm.github.io/OWL-Connection-Manager/');
     };
 }
 

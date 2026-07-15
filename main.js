@@ -948,6 +948,20 @@ ipcMain.handle('decrypt-import-file', async (event, filePath, password) => {
   }
 });
 
+ipcMain.handle('open-external', async (event, url) => {
+  try {
+    if (typeof url !== 'string') return false;
+    const parsed = new URL(url);
+    if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return false;
+    const { shell } = require('electron');
+    await shell.openExternal(parsed.toString());
+    return true;
+  } catch (err) {
+    console.error('Failed to open external URL:', err);
+    return false;
+  }
+});
+
 ipcMain.handle('open-file-dialog', async (event, options) => {
   const allowedExtensions = ['key', 'pem', 'id_rsa', 'id_ed25519', 'json'];
   const { dialog } = require('electron');
@@ -1149,7 +1163,7 @@ ipcMain.handle('get-dir-size', async (event, { connection, path }) => {
   }
 });
 
-// Process Management
+// Used by Sage Diagnose (top process snapshot)
 ipcMain.handle('get-processes', async (event, { connection }) => {
   try {
     const cmd = `ps -eo pid,user,pcpu,pmem,comm --sort=-pcpu | head -n 20 | tail -n +2`;
@@ -1175,19 +1189,6 @@ ipcMain.handle('get-processes', async (event, { connection }) => {
   } catch (err) {
     console.error('Get Processes Error:', err);
     return [];
-  }
-});
-
-ipcMain.handle('kill-process', async (event, { connection, pid }) => {
-  try {
-    const safePid = parseInt(pid);
-    if (isNaN(safePid)) return false;
-    await execQueued(connection, `kill -9 ${safePid}`);
-
-    return true;
-  } catch (err) {
-    console.error('Kill Process Error:', err);
-    return false;
   }
 });
 

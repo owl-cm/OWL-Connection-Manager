@@ -47,9 +47,9 @@
             <svg viewBox="0 0 100 100" class="owl-svg">
               <defs>
                 <linearGradient id="owl-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" style="stop-color:#ddd6fe;stop-opacity:1" />
-                  <stop offset="50%" style="stop-color:#a78bfa;stop-opacity:1" />
-                  <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+                  <stop offset="0%" style="stop-color:#dbeafe;stop-opacity:1" />
+                  <stop offset="50%" style="stop-color:#3b82f6;stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:#1d4ed8;stop-opacity:1" />
                 </linearGradient>
               </defs>
               <!-- Cyber-Shield Owl -->
@@ -61,54 +61,86 @@
           <h2>OWL</h2>
         </div>
         <div class="header-actions">
-          <button id="logout-btn" class="btn-icon btn-icon-logout" title="Lock vault & log out">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.25"
-              stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-              <polyline points="16 17 21 12 16 7"></polyline>
-              <line x1="21" y1="12" x2="9" y2="12"></line>
-            </svg>
-          </button>
-          <button id="settings-btn" class="btn-icon" title="Settings">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="3"></circle>
-              <path
-                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
-              </path>
-            </svg>
-          </button>
-          <button id="export-btn" class="btn-icon" title="Export Connections">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="17 8 12 3 7 8"></polyline>
-              <line x1="12" y1="3" x2="12" y2="15"></line>
-            </svg>
-          </button>
-          <button id="import-btn" class="btn-icon" title="Import Connections">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-          </button>
-          <button id="add-folder-btn" class="btn-icon" title="Add Folder">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
-              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-              <line x1="12" y1="11" x2="12" y2="17"></line>
-              <line x1="9" y1="14" x2="15" y2="14"></line>
-            </svg>
-          </button>
-          <button id="add-btn" class="btn-icon" title="Add Connection">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-          </button>
+          <div class="profile-menu" id="profile-menu">
+            <button type="button" id="profile-menu-btn" class="btn-icon profile-menu-trigger" title="Menu" aria-label="Menu" aria-haspopup="true" aria-expanded="false">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="4" y1="7" x2="20" y2="7"></line>
+                <line x1="4" y1="12" x2="20" y2="12"></line>
+                <line x1="4" y1="17" x2="20" y2="17"></line>
+              </svg>
+            </button>
+            <div id="profile-menu-dropdown" class="profile-menu-dropdown hidden" role="menu">
+              <button type="button" id="add-btn" class="profile-menu-item" role="menuitem">
+                <span class="profile-menu-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                </span>
+                <span>Add Connection</span>
+              </button>
+              <button type="button" id="add-folder-btn" class="profile-menu-item" role="menuitem">
+                <span class="profile-menu-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                    <line x1="12" y1="11" x2="12" y2="17"></line>
+                    <line x1="9" y1="14" x2="15" y2="14"></line>
+                  </svg>
+                </span>
+                <span>Add Folder</span>
+              </button>
+              <div class="profile-menu-separator" role="separator"></div>
+              <button type="button" id="import-btn" class="profile-menu-item" role="menuitem">
+                <span class="profile-menu-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                </span>
+                <span>Import</span>
+              </button>
+              <button type="button" id="export-btn" class="profile-menu-item" role="menuitem">
+                <span class="profile-menu-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                </span>
+                <span>Export</span>
+              </button>
+              <button type="button" id="settings-btn" class="profile-menu-item" role="menuitem">
+                <span class="profile-menu-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path
+                      d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                    </path>
+                  </svg>
+                </span>
+                <span>Preferences</span>
+              </button>
+              <div class="profile-menu-separator" role="separator"></div>
+              <button type="button" id="logout-btn" class="profile-menu-item profile-menu-item-danger" role="menuitem">
+                <span class="profile-menu-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.25"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                  </svg>
+                </span>
+                <span>Lock vault</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
       <div class="sidebar-search">
@@ -251,11 +283,6 @@
                   <span class="dock-label">Broadcast</span>
                 </button>
 
-                <button id="toggle-processes-btn" class="dock-btn" data-feature="processes" title="Remote Process Manager">
-                  <span class="dock-icon" aria-hidden="true"><i class="fas fa-microchip"></i></span>
-                  <span class="dock-label">Processes</span>
-                </button>
-
                 <button id="toggle-docker-btn" class="dock-btn" data-feature="docker" title="Docker Explorer">
                   <span class="dock-icon" aria-hidden="true"><i class="fab fa-docker"></i></span>
                   <span class="dock-label">Docker</span>
@@ -315,16 +342,16 @@
               <svg viewBox="0 0 100 100" class="owl-svg large">
                 <defs>
                   <linearGradient id="owl-gradient-large" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style="stop-color:#818cf8;stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:#6366f1;stop-opacity:1" />
+                    <stop offset="0%" style="stop-color:#60a5fa;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#2563eb;stop-opacity:1" />
                   </linearGradient>
                 </defs>
                 <path d="M50 15 L85 35 L85 75 L50 95 L15 75 L15 35 Z" class="owl-shield"
                   style="stroke: url(#owl-gradient-large); stroke-width: 2.5; fill: none;" />
                 <path d="M30 45 L45 60 M70 45 L55 60" class="owl-eyes-sharp"
-                  style="stroke: #fff; stroke-width: 4; stroke-linecap: round; filter: drop-shadow(0 0 10px #6366f1);" />
+                  style="stroke: #fff; stroke-width: 4; stroke-linecap: round; filter: drop-shadow(0 0 10px #2563eb);" />
                 <rect x="48" y="70" width="4" height="10" class="owl-cursor-core"
-                  style="fill: #fff; filter: drop-shadow(0 0 10px #6366f1);" />
+                  style="fill: #fff; filter: drop-shadow(0 0 10px #2563eb);" />
               </svg>
             </div>
             <h1 class="welcome-title">OWL</h1>
@@ -348,12 +375,12 @@
               <p>Restore from a previous backup</p>
             </div>
 
-            <div id="qa-docs" class="quick-action-card disabled">
+            <div id="qa-docs" class="quick-action-card" role="link" title="Open OWL documentation">
               <div class="quick-action-icon">
                 <i class="fas fa-book"></i>
               </div>
               <h4>Documentation</h4>
-              <p>Coming soon...</p>
+              <p>Guides, features, and getting started</p>
             </div>
           </div>
 
@@ -529,8 +556,8 @@
                 <label for="color-none" class="color-option" style="--c: transparent; border: 1px solid #555"
                   title="None"></label>
 
-                <input type="radio" name="color" value="#6366f1" id="color-indigo">
-                <label for="color-indigo" class="color-option" style="--c: #6366f1" title="Electric Indigo"></label>
+                <input type="radio" name="color" value="#2563eb" id="color-indigo">
+                <label for="color-indigo" class="color-option" style="--c: #2563eb" title="Electric Indigo"></label>
 
                 <input type="radio" name="color" value="#a855f7" id="color-violet">
                 <label for="color-violet" class="color-option" style="--c: #a855f7" title="Vibrant Violet"></label>
@@ -695,7 +722,6 @@
   </div>
   </div>
 
-  <!-- Process Manager Modal -->
   <!-- Docker Explorer Modal -->
   <div id="docker-modal" class="modal hidden">
     <div class="modal-content modal-xl docker-explorer-modal owl-shell-wide">
@@ -769,38 +795,6 @@
             <div class="log-empty-state" id="docker-logs-empty">Select a container to stream live logs</div>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="process-modal" class="modal hidden">
-    <div class="modal-content large owl-shell-wide">
-      <div class="modal-header">
-        <h3>Remote Process Manager</h3>
-        <div class="header-actions">
-          <button id="refresh-processes" class="btn-icon" title="Refresh"><i class="fas fa-sync"></i></button>
-          <button class="close-btn" id="close-process-header-btn">✕</button>
-        </div>
-      </div>
-      <div class="process-list-container">
-        <table id="process-table">
-          <thead>
-            <tr>
-              <th>PID</th>
-              <th>User</th>
-              <th>CPU%</th>
-              <th>MEM%</th>
-              <th>Command</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="process-list-body">
-            <!-- Processes will be injected here -->
-          </tbody>
-        </table>
-      </div>
-      <div class="form-actions">
-        <button type="button" id="close-process-modal" class="btn-secondary">Close</button>
       </div>
     </div>
   </div>
@@ -960,18 +954,34 @@
   <!-- App Confirm Dialog (outside .container so it works while vault is locked) -->
   <div id="confirm-modal" class="modal hidden" style="z-index: 2500;">
     <div class="modal-content owl-shell-compact">
-      <div class="owl-shell-mini-brand">
-        <svg viewBox="0 0 100 100" class="owl-shell-mini-logo" aria-hidden="true">
-          <path d="M50 15 L85 35 L85 75 L50 95 L15 75 L15 35 Z" fill="none" stroke="#a78bfa" stroke-width="3" stroke-linejoin="round" />
-          <path d="M30 45 L45 60 M70 45 L55 60" fill="none" stroke="#f8fafc" stroke-width="4" stroke-linecap="round" />
-        </svg>
-        <span class="owl-shell-mini-name">OWL</span>
+      <header class="owl-shell-brand">
+        <div class="owl-shell-brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 100 100" class="owl-shell-brand-logo">
+            <defs>
+              <linearGradient id="owl-shell-brand-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#93c5fd" />
+                <stop offset="100%" stop-color="#2563eb" />
+              </linearGradient>
+            </defs>
+            <path d="M50 15 L85 35 L85 75 L50 95 L15 75 L15 35 Z" fill="none" stroke="url(#owl-shell-brand-grad)" stroke-width="3.5" stroke-linejoin="round" />
+            <path d="M30 45 L45 60 M70 45 L55 60" fill="none" stroke="#f8fafc" stroke-width="4.5" stroke-linecap="round" />
+          </svg>
+        </div>
+        <div class="owl-shell-brand-copy">
+          <span class="owl-shell-brand-name">OWL</span>
+          <span class="owl-shell-brand-tag">Connection Manager</span>
+        </div>
+      </header>
+
+      <div class="owl-shell-body">
+        <div class="owl-shell-icon" id="confirm-modal-icon" aria-hidden="true">
+          <i class="fas fa-circle-question"></i>
+        </div>
+        <h3 id="confirm-modal-title">Are you sure?</h3>
+        <p id="confirm-modal-lead" class="owl-shell-lead"></p>
+        <p id="confirm-modal-message" class="owl-shell-message"></p>
       </div>
-      <div class="owl-shell-icon" id="confirm-modal-icon" aria-hidden="true">
-        <i class="fas fa-circle-question"></i>
-      </div>
-      <h3 id="confirm-modal-title">Are you sure?</h3>
-      <p id="confirm-modal-message" class="owl-shell-message"></p>
+
       <div class="owl-shell-actions">
         <button type="button" id="confirm-modal-cancel-btn" class="btn-secondary">Cancel</button>
         <button type="button" id="confirm-modal-ok-btn" class="btn-danger">Confirm</button>
@@ -988,9 +998,9 @@
           <svg viewBox="0 0 100 100" class="owl-auth-logo" aria-hidden="true">
             <defs>
               <linearGradient id="owl-gradient-auth-setup" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#ddd6fe" />
-                <stop offset="50%" stop-color="#a78bfa" />
-                <stop offset="100%" stop-color="#7c3aed" />
+                <stop offset="0%" stop-color="#dbeafe" />
+                <stop offset="50%" stop-color="#3b82f6" />
+                <stop offset="100%" stop-color="#1d4ed8" />
               </linearGradient>
             </defs>
             <g class="owl-auth-mark" transform="translate(2 -5)">
@@ -1043,9 +1053,9 @@
           <svg viewBox="0 0 100 100" class="owl-auth-logo" aria-hidden="true">
             <defs>
               <linearGradient id="owl-gradient-auth-unlock" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#ddd6fe" />
-                <stop offset="50%" stop-color="#a78bfa" />
-                <stop offset="100%" stop-color="#7c3aed" />
+                <stop offset="0%" stop-color="#dbeafe" />
+                <stop offset="50%" stop-color="#3b82f6" />
+                <stop offset="100%" stop-color="#1d4ed8" />
               </linearGradient>
             </defs>
             <g class="owl-auth-mark" transform="translate(2 -5)">
@@ -1095,9 +1105,9 @@
           <svg viewBox="0 0 100 100" class="owl-auth-logo" aria-hidden="true">
             <defs>
               <linearGradient id="owl-gradient-auth-import" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#ddd6fe" />
-                <stop offset="50%" stop-color="#a78bfa" />
-                <stop offset="100%" stop-color="#7c3aed" />
+                <stop offset="0%" stop-color="#dbeafe" />
+                <stop offset="50%" stop-color="#3b82f6" />
+                <stop offset="100%" stop-color="#1d4ed8" />
               </linearGradient>
             </defs>
             <g class="owl-auth-mark" transform="translate(2 -5)">
